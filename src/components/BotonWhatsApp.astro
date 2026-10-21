@@ -1,0 +1,49 @@
+---
+/**
+ * Botón flotante de WhatsApp con texto (requisito 18). Solo aparece cuando hay
+ * número en settings.yaml: hoy está pendiente y no se inventa uno.
+ * En móvil va en la esquina inferior derecha, pequeño, y en /registro se
+ * oculta para no tapar el formulario.
+ */
+import theme from '../theme.config';
+import { ruta } from '../lib/rutas';
+import Icono from './Icono.astro';
+
+const numero = theme.contact.whatsappNumber;
+const url = numero ? `https://wa.me/${numero}?text=${encodeURIComponent(theme.contact.whatsappDefaultMessage)}` : '';
+const enRegistro = Astro.url.pathname.startsWith(ruta('registro/'));
+---
+
+{
+  numero && !enRegistro && (
+    <a class="whatsapp" href={url} target="_blank" rel="noopener" data-cta="whatsapp_flotante" data-cta-location="flotante">
+      <Icono nombre="whatsapp-logo" tamano={22} />
+      <span>{theme.whatsapp.cta}</span>
+    </a>
+  )
+}
+
+<style>
+  .whatsapp {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--color-navy);
+    color: var(--color-on-navy);
+    font-weight: 600;
+    font-size: var(--text-label-md);
+    text-decoration: none;
+    transition: transform 200ms var(--curva);
+  }
+  .whatsapp:hover {
+    color: var(--color-on-navy);
+    transform: translateY(-2px);
+  }
+</style>

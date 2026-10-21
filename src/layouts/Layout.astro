@@ -1,0 +1,162 @@
+---
+/**
+ * Layout.astro — base de todas las páginas.
+ *
+ * - Metadatos, canonical y og:image absolutos (respetan la ruta base).
+ * - Fuentes autoalojadas (Fontsource) con las dos variantes latinas precargadas.
+ * - Favicons generados en el build desde public/favicon.svg.
+ * - JSON-LD: una sola entidad Event (sin reseñas, sin precio hasta tenerlo).
+ * - Analítica: no hay GA4 todavía; cuando exista, el consentimiento va antes.
+ */
+import '../styles/global.css';
+import theme from '../theme.config';
+import settings from '../content/settings';
+import { ruta, absoluta } from '../lib/rutas';
+import Cabecera from '../components/Cabecera.astro';
+import Pie from '../components/Pie.astro';
+import BotonWhatsApp from '../components/BotonWhatsApp.astro';
+import hubotLatin from '@fontsource-variable/hubot-sans/files/hubot-sans-latin-standard-normal.woff2?url';
+import atkinsonLatin from '@fontsource-variable/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-wght-normal.woff2?url';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Avisos legales, vista previa del registro y 404: fuera de Google. */
+  noindex?: boolean;
+  /** JSON-LD adicional de la página (p. ej. FAQPage en el inicio). */
+  schemaExtra?: object[];
+  /** La 404 no lleva canonical (no es una URL real del sitio). */
+  sinCanonical?: boolean;
+}
+
+const { title = theme.seo.title, description = theme.seo.description, noindex = false, schemaExtra = [], sinCanonical = false } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = absoluta(theme.seo.ogImage, Astro.site);
+const inicio = absoluta('', Astro.site);
+
+const evento = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: settings.negocio.nombre,
+  description: settings.negocio.descripcionCorta,
+  url: inicio,
+  image: ogImage,
+  inLanguage: 'es-MX',
+  startDate: '2027-06-09',
+  endDate: '2027-06-10',
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: {
+    '@type': 'Place',
+    name: settings.sede.nombre,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: settings.sede.ciudad,
+      addressRegion: settings.sede.estado,
+      addressCountry: 'MX',
+    },
+  },
+  organizer: [
+    { '@type': 'Organization', name: 'ANAPSA (Agencia Nacional del Sector Automotriz)' },
+    { '@type': 'Organization', name: 'ADN de la Manufactura' },
+  ],
+};
+const esInicio = Astro.url.pathname === ruta('');
+const esquemas = [...(esInicio ? [evento] : []), ...schemaExtra];
+---
+
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {!sinCanonical && <link rel="canonical" href={canonical} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={settings.negocio.nombre} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_MX" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!--
+      Antes de pintar: html.js habilita los estados de entrada (sin JS todo se ve).
+      En la portada, html.has-preloader en cada carga (pedido de Cori), nunca con
+      movimiento reducido ni Save-Data. El CSS lo retira solo a los 2 s.
+    -->
+    <script is:inline set:html={`(function(){var d=document.documentElement;d.classList.add('js');${esInicio ? `try{var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;var sd=navigator.connection&&navigator.connection.saveData;if(!rm&&!sd){d.classList.add('has-preloader','con-preloader');}}catch(e){}` : ''}})();`} />
+    <slot name="precarga" />
+    <link rel="preload" href={hubotLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={atkinsonLatin} as="font" type="font/woff2" crossorigin />
+
+    <link rel="icon" href={ruta('favicon.ico')} sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href={ruta('favicon.svg')} />
+    <link rel="apple-touch-icon" href={ruta('apple-touch-icon.png')} />
+    <link rel="manifest" href={ruta('site.webmanifest')} />
+    <meta name="theme-color" content={theme.colorTema} />
+
+    {esquemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    <Cabecera sobrePortada={esInicio} />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Pie />
+    <BotonWhatsApp />
+
+    <script>
+      // Revelado en faceta: una sola vez, al entrar en pantalla.
+      // El estado oculto solo existe bajo html.js y sin movimiento reducido.
+      // Ojo: con clip-path el intersectionRatio queda en 0, así que se usa
+      // isIntersecting con threshold 0 y un margen inferior del 25 % de la
+      // ventana (equivale a entrar un cuarto en pantalla).
+      const elementos = document.querySelectorAll<HTMLElement>('[data-revelar], [data-observar]');
+      if (elementos.length) {
+        if (!('IntersectionObserver' in window)) {
+          elementos.forEach((el) => el.classList.add('revelado'));
+        } else {
+          const io = new IntersectionObserver(
+            (entradas) => {
+              entradas.forEach((e) => {
+                if (e.isIntersecting) {
+                  e.target.classList.add('revelado');
+                  io.unobserve(e.target);
+                }
+              });
+            },
+            { threshold: 0, rootMargin: '0px 0px -25% 0px' }
+          );
+          elementos.forEach((el) => io.observe(el));
+        }
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  .saltar {
+    position: absolute;
+    left: 16px;
+    top: -100px;
+    z-index: 50;
+    padding: 12px 16px;
+    background: var(--color-navy);
+    color: var(--color-on-navy);
+    border-radius: var(--radius-sm);
+  }
+  .saltar:focus {
+    top: 16px;
+  }
+</style>

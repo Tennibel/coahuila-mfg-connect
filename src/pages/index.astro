@@ -1,0 +1,1756 @@
+---
+/**
+ * Inicio (v2) — piel del brochure sobre el esqueleto de un sitio de evento.
+ * Copy: agente/hechos.json. Contrato: agente/DESIGN.md (v2).
+ *
+ * Imágenes y video: Higgsfield (IA), material provisional aprobado por Cori el
+ * 2026-10-21. Cada imagen lleva data-ia="higgsfield" y está en /creditos.
+ */
+import { Picture, getImage } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import Seccion from '../components/Seccion.astro';
+import Pendiente from '../components/Pendiente.astro';
+import Icono from '../components/Icono.astro';
+import settings from '../content/settings';
+import { preguntas } from '../content/evento';
+import { ruta } from '../lib/rutas';
+
+import imgHero from '../assets/ia/00-hero-robot.png';
+import imgPiezas from '../assets/ia/01-piezas.png';
+import imgB2b from '../assets/ia/02-b2b.png';
+import imgForo from '../assets/ia/03-foro.png';
+import imgCnc from '../assets/ia/04-cnc.png';
+import imgEnsamble from '../assets/ia/05-ensamble.png';
+import imgArneses from '../assets/ia/06-arneses.png';
+import imgRed from '../assets/ia/07-red.png';
+
+const correo = settings.contacto.email;
+
+// Precarga de la imagen de portada: las mismas URL AVIF que usa el <picture>
+// (el <video> no lleva atributo poster: el <picture> ya cubre la vista y así
+// el póster se descarga una sola vez).
+// Mismo juego de anchos que el <picture> para que el navegador elija la misma URL.
+const ANCHOS_HERO = [640, 960, 1280, 1920];
+const posterAvif = await Promise.all(
+  ANCHOS_HERO.map((w) => getImage({ src: imgHero, width: w, format: 'avif', quality: 55 }))
+);
+const precargaSrcset = posterAvif.map((im, i) => `${im.src} ${ANCHOS_HERO[i]}w`).join(', ');
+
+// Cuenta regresiva: días hasta el 9 de junio de 2027 (hora de Torreón,
+// America/Monterrey = UTC−6). Se calcula en el build y el JS la actualiza.
+const INICIO = Date.UTC(2027, 5, 9, 6, 0, 0); // 00:00 en Torreón
+const FIN = Date.UTC(2027, 5, 11, 6, 0, 0);
+const diasFaltan = Math.max(0, Math.ceil((INICIO - Date.now()) / 86400000));
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: preguntas
+    .filter((p) => !p.pendiente)
+    .map((p) => ({
+      '@type': 'Question',
+      name: p.pregunta,
+      acceptedAnswer: { '@type': 'Answer', text: p.respuesta.replace(/<[^>]+>/g, '') },
+    })),
+};
+
+const temasForo = ['Mercado e inversión industrial', 'T-MEC, aranceles y reglas de origen', 'Geopolítica y cadenas de suministro'];
+const temasStage = [
+  'Maquinado CNC y herramentales',
+  'Fundición, formado y soldadura',
+  'Plásticos y materiales avanzados',
+  'Automatización e IA aplicada',
+  'Metrología, calidad y trazabilidad',
+  'Mantenimiento y productividad',
+];
+
+const hitos = [
+  {
+    fecha: '8 de junio',
+    titulo: 'Visitas industriales',
+    condicion: 'Propuestas, sujetas a autorización. Para expositores.',
+    actividades: ['Ruta A: Stellantis, Saltillo', 'Ruta B: John Deere y Lear E-Systems, La Laguna'],
+  },
+  {
+    fecha: '9 de junio',
+    titulo: 'Día 1 del evento',
+    actividades: ['Exposición', 'Encuentros B2B (solo expositores)', 'Foro de Industria y Mercado', 'Stage de Conferencias Técnicas'],
+  },
+  {
+    fecha: '10 de junio',
+    titulo: 'Día 2 del evento',
+    actividades: ['Exposición', 'Encuentros B2B (solo expositores)', 'Foro de Industria y Mercado', 'Stage de Conferencias Técnicas'],
+  },
+];
+---
+
+<Layout schemaExtra={[faqSchema]}>
+  <link
+    slot="precarga"
+    rel="preload"
+    as="image"
+    href={posterAvif[posterAvif.length - 1].src}
+    imagesrcset={precargaSrcset}
+    imagesizes="100vw"
+    type="image/avif"
+    fetchpriority="high"
+  />
+
+  <!-- Preloader: solo existe con html.has-preloader (script del <head>). -->
+  <div class="preloader" aria-hidden="true" data-preloader>
+    <div class="preloader__telon"></div>
+    <div class="marco preloader__marco">
+      <span class="preloader__linea"></span>
+      <span class="nota preloader__rotulo">Torreón · <span class="cifra">103.45° O</span></span>
+      <p class="preloader__marca">
+        <span class="preloader__nombre">Coahuila Automotive & Manufacturing Connect</span>
+        <span class="preloader__fecha cifra">9 y 10 de junio de 2027, Torreón</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- ================= Portada ================= -->
+  <section class="hero" aria-labelledby="hero-titulo">
+    <div class="hero__medio">
+      <Picture
+        src={imgHero}
+        formats={['avif']}
+        fallbackFormat="webp"
+        widths={ANCHOS_HERO}
+        sizes="100vw"
+        quality={55}
+        alt="Brazo robótico sobre una carcasa de motor en una planta iluminada en azul (imagen ilustrativa)"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class="hero__poster"
+        data-ia="higgsfield"
+        data-poster
+      />
+      <video
+        class="hero__video"
+        muted
+        loop
+        playsinline
+        preload="none"
+        aria-hidden="true"
+        data-video
+        data-webm-1920={ruta('media/hero-1920.webm')}
+        data-mp4-1920={ruta('media/hero-1920.mp4')}
+        data-webm-1280={ruta('media/hero-1280.webm')}
+        data-mp4-1280={ruta('media/hero-1280.mp4')}
+      ></video>
+      <div class="hero__velo"></div>
+    </div>
+
+    <div class="marco hero__marco">
+      <div class="hero__contenido">
+        <span class="hero__meridiano" aria-hidden="true"></span>
+        <h1 id="hero-titulo" class="hero__h1">La manufactura de México, Estados Unidos y Canadá se conecta en Torreón</h1>
+        <div class="hero__fila">
+        <div class="hero__datos entra">
+          <p class="fecha">9 y 10 de junio de 2027</p>
+          <p class="entrada">{settings.sede.nombre}</p>
+        </div>
+        <div
+          class="cuenta entra"
+          role="timer"
+          aria-live="off"
+          aria-label={`Faltan ${diasFaltan} días para el 9 de junio de 2027`}
+          data-cuenta
+          data-inicio={INICIO}
+          data-fin={FIN}
+        >
+          <span class="cuenta__antes nota" aria-hidden="true">Faltan</span>
+          <span class="cuenta__numero cifra" aria-hidden="true" data-cuenta-numero>{diasFaltan}</span>
+          <span class="cuenta__unidad nota" aria-hidden="true">días</span>
+        </div>
+        </div>
+        <div class="hero__acciones entra">
+          <a class="boton" href={ruta('registro/')} data-cta="registrarme" data-cta-location="hero">Registrarme</a>
+          <a class="enlace-suelto" href="#expositores" data-cta="exponer_patrocinar" data-cta-location="hero">Exponer o patrocinar</a>
+        </div>
+      </div>
+
+      <div class="hero__pie">
+        <button class="hero__pausa" type="button" hidden data-pausa>
+          <span class="hero__pausa-icono" data-icono-pausa><Icono nombre="pause" tamano={20} /></span>
+          <span class="hero__pausa-icono" data-icono-play hidden><Icono nombre="play" tamano={20} /></span>
+          <span data-pausa-texto>Pausar video</span>
+        </button>
+        <dl class="barra chaflan">
+          <div class="barra__celda barra__celda--fecha">
+            <dt class="rotulo">Fecha</dt>
+            <dd>9 y 10 de junio de 2027</dd>
+          </div>
+          <div class="barra__celda">
+            <dt class="rotulo">Sede</dt>
+            <dd>{settings.sede.nombre}</dd>
+          </div>
+          <div class="barra__celda">
+            <dt class="rotulo">Visitas industriales</dt>
+            <dd>8 de junio (propuestas)</dd>
+          </div>
+          <div class="barra__celda">
+            <dt class="rotulo">Organizan</dt>
+            <dd>ANAPSA y ADN de la Manufactura</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!--
+    La línea del preloader se coloca exactamente sobre el meridiano de la
+    portada (misma x, mismo inicio y mismo final): es la misma línea.
+    En línea para que corra antes del primer pintado del preloader.
+  -->
+  <script is:inline>
+    (function () {
+      var d = document.documentElement;
+      if (!d.classList.contains('has-preloader')) return;
+      var hero = document.querySelector('.hero__meridiano');
+      var linea = document.querySelector('.preloader__linea');
+      var rotulo = document.querySelector('.preloader__rotulo');
+      if (!hero || !linea) return;
+      function alinear() {
+        var r = hero.getBoundingClientRect();
+        linea.style.position = 'fixed';
+        linea.style.left = r.left + 'px';
+        linea.style.top = r.top + 'px';
+        linea.style.height = r.height + 'px';
+        if (rotulo) {
+          rotulo.style.position = 'fixed';
+          rotulo.style.left = r.left + 16 + 'px';
+          rotulo.style.top = r.top - 6 + 'px';
+        }
+        var marca = document.querySelector('.preloader__marca');
+        if (marca) {
+          marca.style.position = 'fixed';
+          marca.style.left = r.left + 24 + 'px';
+          marca.style.top = r.top + r.height * 0.42 + 'px';
+        }
+      }
+      alinear();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(alinear);
+      window.addEventListener('resize', alinear);
+    })();
+  </script>
+
+  <!-- ================= Qué es ================= -->
+  <section id="que-es" class="seccion que-es" aria-labelledby="que-es-titulo">
+    <div class="marco">
+      <div class="que-es__texto">
+        <div class="cabeza-seccion" data-revelar>
+          <h2 id="que-es-titulo">Compradores y proveedores de tres países, dos días en Torreón</h2>
+          <p class="entrada">
+            Coahuila Automotive & Manufacturing Connect reúne a empresas compradoras, proveedores de tecnología y
+            fabricantes de distintas industrias para fortalecer la proveeduría entre México, Estados Unidos y Canadá.
+          </p>
+        </div>
+        <p>
+          Es un lugar para conocer capacidades de manufactura, encontrar soluciones industriales y abrir conversaciones
+          que puedan terminar en negocio.
+        </p>
+        <dl class="conecta">
+          <div>
+            <dt>Compradores de estos sectores</dt>
+            <dd>
+              Automotriz y autopartes, metalmecánica, maquinaria, electrodomésticos, alimentos y bebidas, y plásticos.
+              Son los sectores convocados; las empresas participantes se anunciarán.
+            </dd>
+          </div>
+          <div>
+            <dt>Proveedores de</dt>
+            <dd>Componentes, procesos de fabricación, maquinaria, automatización, materiales y servicios industriales.</dd>
+          </div>
+          <div>
+            <dt>Para quienes trabajan en</dt>
+            <dd>Compras, desarrollo de proveedores, ingeniería, manufactura, operaciones y dirección de planta.</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    <figure class="foto que-es__foto" data-revelar>
+      <Picture
+        src={imgPiezas}
+        formats={['avif']}
+        fallbackFormat="webp"
+        widths={[640, 960, 1400, 1920]}
+        sizes="(min-width: 1024px) 55vw, 100vw"
+        quality={60}
+        alt="Piezas metálicas maquinadas, un engrane y un estator de cobre sobre fondo azul (imagen ilustrativa)"
+        loading="lazy"
+        data-ia="higgsfield"
+      />
+      <span class="faceta faceta--izq" aria-hidden="true"></span>
+    </figure>
+  </section>
+
+  <!-- ================= Agenda (línea de tiempo) ================= -->
+  <section id="agenda" class="seccion agenda" aria-labelledby="agenda-titulo" data-observar>
+    <div class="marco">
+      <div class="cabeza-seccion">
+        <h2 id="agenda-titulo">Agenda: tres días en junio de 2027</h2>
+        <p class="entrada">Un día de visitas industriales y dos días de evento en el Centro de Convenciones Torreón.</p>
+      </div>
+      <div class="linea-tiempo">
+        <span class="linea-tiempo__linea" aria-hidden="true"></span>
+        <ol class="linea-tiempo__hitos">
+        {
+          hitos.map((h, i) => (
+            <li class="hito" style={`--i:${i}`}>
+              <span class="hito__marca" aria-hidden="true" />
+              <p class="hito__fecha cifra">{h.fecha}</p>
+              <h3 class="hito__titulo">{h.titulo}</h3>
+              {h.condicion && <p class="nota hito__condicion">{h.condicion}</p>}
+              <ul class="hito__lista">
+                {h.actividades.map((a) => <li>{a}</li>)}
+              </ul>
+              <p class="nota hito__horario">Horarios: <Pendiente texto="horarios" /></p>
+            </li>
+          ))
+        }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Banda «Registrarme» ================= -->
+  <section class="banda banda--foto union" aria-labelledby="banda-registro-titulo">
+    <div class="banda__foto" data-revelar>
+      <Picture
+        src={imgRed}
+        formats={['avif']}
+        fallbackFormat="webp"
+        widths={[640, 1024, 1600, 2400]}
+        sizes="100vw"
+        quality={55}
+        alt="Mapa de Norteamérica en azul con una red de puntos de luz (imagen ilustrativa)"
+        loading="lazy"
+        data-ia="higgsfield"
+      />
+    </div>
+    <div class="banda__velo"></div>
+    <div class="marco banda__contenido">
+      <h2 id="banda-registro-titulo">9 y 10 de junio, Torreón</h2>
+      <p class="entrada">Registro de visitante con pago en línea y QR por correo.</p>
+      <p>
+        <a class="boton" href={ruta('registro/')} data-cta="registrarme" data-cta-location="banda">Registrarme</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= Encuentros B2B ================= -->
+  <Seccion
+    id="b2b"
+    titulo="Encuentros B2B: 15 mesas y citas de 15 minutos"
+    entrada="Agenda de citas entre compradores calificados y empresas proveedoras durante los dos días del evento."
+    revelar
+  >
+    <div class="b2b">
+      <figure class="foto b2b__foto" data-revelar>
+        <div class="chaflan b2b__recorte">
+          <Picture
+            src={imgB2b}
+            formats={['avif']}
+        fallbackFormat="webp"
+            widths={[480, 800, 1168]}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            quality={60}
+            alt="Tres personas de negocios revisan una pieza metálica y planos en una mesa de encuentros (imagen ilustrativa)"
+            loading="lazy"
+            data-ia="higgsfield"
+          />
+        </div>
+      </figure>
+      <ul class="cifras" data-revelar>
+        <li>
+          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> 80</span>
+          <span class="cifras__etiqueta">empresas proveedoras · meta</span>
+        </li>
+        <li>
+          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> 60</span>
+          <span class="cifras__etiqueta">compradores calificados · meta</span>
+        </li>
+        <li>
+          <span class="cifras__numero cifra">15<span class="cifras__unidad">min</span></span>
+          <span class="cifras__etiqueta">por cita, en 15 mesas de negocios</span>
+        </li>
+      </ul>
+      <div class="cifras-ancha">
+        <p class="rotulo">Meta</p>
+        <p class="cifras__numero cifra">380 a 400</p>
+        <p class="cifras__etiqueta">citas B2B en dos días. La agenda depende de la disponibilidad y de que los perfiles coincidan.</p>
+      </div>
+      <div class="panel chaflan b2b__panel pila">
+        <p class="fuerte">
+          Las citas B2B son solo para expositores: para tener agenda es indispensable exponer. El boleto de visitante no
+          incluye citas (<Pendiente texto="confirmar qué incluye el boleto de visitante" />).
+        </p>
+        <p>
+          El programa B2B tiene un patrocinio exclusivo, con cotización a la medida: presencia de marca en el área de
+          encuentros, en la señalización y en la comunicación del evento.
+        </p>
+        <p><a class="enlace-suelto" href="#expositores" data-cta="quiero_exponer" data-cta-location="b2b">Quiero exponer</a></p>
+      </div>
+    </div>
+  </Seccion>
+
+  <!-- ================= Foro, stage y ponentes ================= -->
+  <Seccion
+    id="programa"
+    titulo="Foro de industria y stage técnico"
+    entrada="Temas previstos; programa y participantes por confirmar."
+    revelar
+  >
+    <div class="foro">
+      <figure class="foto foro__foto" data-revelar>
+        <Picture
+          src={imgForo}
+          formats={['avif']}
+        fallbackFormat="webp"
+          widths={[480, 800, 1168]}
+          sizes="(min-width: 1024px) 58vw, 100vw"
+          quality={60}
+          alt="Ponente en un escenario frente a un auditorio, con un mapa de Norteamérica en la pantalla (imagen ilustrativa)"
+          loading="lazy"
+          data-ia="higgsfield"
+        />
+      </figure>
+      <div class="foro__texto pila">
+        <h3>Foro de Industria y Mercado</h3>
+        <p>
+          Para escuchar a quienes deciden en la manufactura y revisar lo que está cambiando en la proveeduría entre
+          México, Estados Unidos y Canadá.
+        </p>
+        <ul class="indice">
+          {temasForo.map((t) => <li>{t}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage__cabeza pila">
+        <h3>Stage de Conferencias Técnicas</h3>
+        <p>Procesos y tecnologías de producción que se aplican en distintas industrias.</p>
+      </div>
+      <div class="stage__rejilla">
+        <figure class="foto stage__foto" data-revelar>
+          <Picture
+            src={imgCnc}
+            formats={['avif']}
+        fallbackFormat="webp"
+            widths={[480, 800, 1168]}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            quality={60}
+            alt="Fresa de una máquina CNC cortando un bloque de aluminio con refrigerante (imagen ilustrativa)"
+            loading="lazy"
+            data-ia="higgsfield"
+          />
+        </figure>
+        {
+          temasStage.map((t, i) => (
+            <div class={`panel chaflan stage__tema stage__tema--${i + 1}`}>
+              <p class="stage__titulo">{t}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="panel chaflan ponentes">
+      <h3>Ponentes</h3>
+      <p><Pendiente texto="ponentes por confirmar" /></p>
+    </div>
+  </Seccion>
+
+  <!-- ================= Visitas industriales ================= -->
+  <section id="visitas" class="seccion visitas" aria-labelledby="visitas-titulo">
+    <div class="marco">
+      <div class="cabeza-seccion" data-revelar>
+        <h2 id="visitas-titulo">Visitas industriales el 8 de junio de 2027</h2>
+        <p class="entrada">
+          Propuestas, sujetas a autorización y disponibilidad de las plantas. Beneficio para expositores, con cupo
+          limitado.
+        </p>
+      </div>
+    </div>
+    <div class="visitas__par" data-revelar>
+      <figure class="foto visitas__foto visitas__foto--a">
+        <Picture
+          src={imgEnsamble}
+          formats={['avif']}
+        fallbackFormat="webp"
+          widths={[480, 800, 1168]}
+          sizes="(min-width: 768px) 55vw, 100vw"
+          quality={60}
+          alt="Técnico trabaja en el motor de una camioneta en una línea de ensamble (imagen ilustrativa)"
+          loading="lazy"
+          data-ia="higgsfield"
+        />
+        <figcaption class="visitas__rotulo">
+          <span class="fecha">Ruta A · Saltillo</span>
+          <span>El ensamble automotriz y su cadena de proveeduría.</span>
+        </figcaption>
+      </figure>
+      <figure class="foto visitas__foto visitas__foto--b">
+        <Picture
+          src={imgArneses}
+          formats={['avif']}
+        fallbackFormat="webp"
+          widths={[480, 800, 1168]}
+          sizes="(min-width: 768px) 55vw, 100vw"
+          quality={60}
+          alt="Operarias y operarios arman arneses eléctricos junto a motores en una planta (imagen ilustrativa)"
+          loading="lazy"
+          data-ia="higgsfield"
+        />
+        <figcaption class="visitas__rotulo">
+          <span class="fecha">Ruta B · La Laguna</span>
+          <span>Dos procesos de manufactura.</span>
+        </figcaption>
+      </figure>
+      <span class="visitas__corte" aria-hidden="true"></span>
+    </div>
+    <div class="marco visitas__pie">
+      <p class="pie-foto">Imagen ilustrativa; no corresponde a las plantas de la ruta.</p>
+      <dl class="visitas__plantas">
+        <div><dt>Ruta A</dt><dd>Stellantis, Saltillo</dd></div>
+        <div><dt>Ruta B</dt><dd>John Deere y Lear E-Systems, La Laguna</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= Boletos y registro ================= -->
+  <section id="boletos" class="seccion seccion--panel union" aria-labelledby="boletos-titulo">
+    <div class="marco">
+      <div class="cabeza-seccion">
+        <h2 id="boletos-titulo">Boleto de visitante y registro en tres pasos</h2>
+      </div>
+      <div class="boletos">
+        <div class="panel chaflan boleto pila-lg">
+          <h3>Boleto de visitante</h3>
+          <dl class="boleto__datos">
+            <div><dt class="fuerte">Precio</dt><dd><Pendiente texto="precio del boleto" /></dd></div>
+            <div><dt class="fuerte">Incluye</dt><dd><Pendiente texto="qué incluye el boleto" /></dd></div>
+            <div><dt class="fuerte">Registro</dt><dd>Apertura y cierre: <Pendiente texto="fechas" /></dd></div>
+          </dl>
+          <p>
+            <a class="boton" href={ruta('registro/')} data-cta="ir_registro" data-cta-location="boletos">Ir al registro</a>
+          </p>
+        </div>
+        <ol class="pasos">
+          <li>
+            <span class="pasos__numero cifra">1</span>
+            <h3>Elija su boleto y pague</h3>
+            <p>En línea con Mercado Pago: tarjeta de crédito o débito, efectivo en tiendas de conveniencia y otros medios activos.</p>
+          </li>
+          <li>
+            <span class="pasos__numero cifra">2</span>
+            <h3>Reciba su QR por correo</h3>
+            <p>
+              Le llega un QR individual cuando el pago queda aprobado. Si paga en efectivo, recibe las instrucciones; si
+              la ficha vence sin pagarse, el lugar se libera.
+            </p>
+          </li>
+          <li>
+            <span class="pasos__numero cifra">3</span>
+            <h3>Preséntelo en el acceso</h3>
+            <p>En el Centro de Convenciones Torreón, el 9 o el 10 de junio de 2027.</p>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Organizan y aliados ================= -->
+  <Seccion id="organizadores" titulo="Lo organizan ANAPSA y ADN de la Manufactura">
+    <div class="organizan">
+      <div class="pila">
+        <h3>ANAPSA</h3>
+        <p class="nota">Agencia Nacional del Sector Automotriz</p>
+        <p>Vincula a armadoras y fabricantes de autopartes con proveedores de México, Estados Unidos y Canadá.</p>
+      </div>
+      <div class="pila">
+        <h3>ADN de la Manufactura</h3>
+        <p>Organiza encuentros B2B, exposiciones y espacios técnicos para distintos sectores industriales.</p>
+      </div>
+    </div>
+    <dl class="aliados">
+      <div>
+        <dt class="fuerte">Aliados</dt>
+        <dd>CONCANACO SERVYTUR México, ATMS (Asociación para Tecnologías, Manufactura y Soluciones, A.C.) y CANACINTRA</dd>
+      </div>
+      <div>
+        <dt class="fuerte">Medio oficial</dt>
+        <dd>Mexico Industry</dd>
+      </div>
+      <div>
+        <dt class="fuerte">Logos</dt>
+        <dd><Pendiente texto="logos en vector y permiso de uso" /></dd>
+      </div>
+    </dl>
+  </Seccion>
+
+  <!-- ================= Banda «Exponer o patrocinar» ================= -->
+  <section id="expositores" class="seccion seccion--panel union banda-exponer" aria-labelledby="expositores-titulo">
+    <div class="marco reticula">
+      <div class="banda-exponer__cabeza">
+        <h2 id="expositores-titulo">Exponer o patrocinar en Torreón</h2>
+      </div>
+      <div class="banda-exponer__texto pila-lg">
+        <p class="entrada">
+          Como expositor tiene acceso a la agenda de citas B2B con compradores y a las visitas industriales propuestas
+          para el 8 de junio, con cupo limitado y sujetas a la autorización de las plantas.
+        </p>
+        <p>
+          Para patrocinar, hay un patrocinio exclusivo del programa B2B, con cotización a la medida. Paquetes:
+          <Pendiente texto="qué incluye cada paquete de expositor y de patrocinio" />.
+        </p>
+        <p class="nota">Expositores y patrocinadores no se registran en línea: escríbanos y le enviamos la información.</p>
+        <ul class="contacto">
+          <li>
+            <Icono nombre="envelope" tamano={22} />
+            <a class="enlace-suelto" href={`mailto:${correo}?subject=${encodeURIComponent('Exponer o patrocinar en Coahuila MFG Connect')}`} data-cta="pedir_informacion" data-cta-location="expositores">Pedir información</a>
+            <span class="nota">{correo}</span>
+          </li>
+          <li><span class="nota">Teléfono o WhatsApp: <Pendiente texto="número de contacto" /></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Sede ================= -->
+  <Seccion id="sede" titulo="Centro de Convenciones Torreón">
+    <dl class="ficha">
+      <div><dt>Ciudad</dt><dd>Torreón, Coahuila, México</dd></div>
+      <div><dt>Dirección</dt><dd><Pendiente texto="dirección exacta y mapa del Centro de Convenciones" /></dd></div>
+      <div><dt>Estacionamiento</dt><dd><Pendiente texto="estacionamiento" /></dd></div>
+      <div><dt>Hospedaje</dt><dd><Pendiente texto="hoteles sede o convenios, si los hay" /></dd></div>
+    </dl>
+  </Seccion>
+
+  <!-- ================= Preguntas ================= -->
+  <Seccion id="preguntas" titulo="Preguntas frecuentes antes del 9 de junio">
+    <div class="faq">
+      {
+        preguntas.map((p) => (
+          <details class="faq__item">
+            <summary>
+              <span>{p.pregunta}</span>
+              <span class="faq__icono"><Icono nombre="plus" tamano={22} /></span>
+            </summary>
+            <div class="faq__respuesta pila">
+              <p set:html={p.respuesta} />
+              {p.pendiente && <p><Pendiente texto={p.pendiente} /></p>}
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </Seccion>
+</Layout>
+
+<script>
+  // ---------- Video de portada ----------
+  const video = document.querySelector<HTMLVideoElement>('[data-video]');
+  const pausa = document.querySelector<HTMLButtonElement>('[data-pausa]');
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ahorro = (navigator as any).connection?.saveData === true;
+  if (video && pausa && !reducido && !ahorro) {
+    const ancho = window.innerWidth <= 900 ? '1280' : '1920';
+    for (const [tipo, formato] of [
+      ['video/webm', 'webm'],
+      ['video/mp4', 'mp4'],
+    ]) {
+      const s = document.createElement('source');
+      s.type = tipo;
+      s.src = video.getAttribute(`data-${formato}-${ancho}`) ?? '';
+      video.appendChild(s);
+    }
+    let pausadoPorUsuario = false;
+    let enPantalla = true;
+    const texto = pausa.querySelector<HTMLElement>('[data-pausa-texto]');
+    const iconoPausa = pausa.querySelector<HTMLElement>('[data-icono-pausa]');
+    const iconoPlay = pausa.querySelector<HTMLElement>('[data-icono-play]');
+    const pintarBoton = () => {
+      const corriendo = !video.paused;
+      if (texto) texto.textContent = corriendo ? 'Pausar video' : 'Reproducir video';
+      if (iconoPausa) iconoPausa.hidden = !corriendo;
+      if (iconoPlay) iconoPlay.hidden = corriendo;
+    };
+    const intentar = () => {
+      if (pausadoPorUsuario || !enPantalla || document.hidden) return;
+      video.play().catch(() => {});
+    };
+    video.addEventListener('playing', () => {
+      video.classList.add('activo');
+      pausa.hidden = false;
+      pintarBoton();
+    });
+    video.addEventListener('pause', pintarBoton);
+    video.load();
+    intentar();
+    pausa.addEventListener('click', () => {
+      if (video.paused) {
+        pausadoPorUsuario = false;
+        intentar();
+      } else {
+        pausadoPorUsuario = true;
+        video.pause();
+      }
+    });
+    new IntersectionObserver(([e]) => {
+      enPantalla = e.isIntersecting;
+      if (enPantalla) intentar();
+      else video.pause();
+    }).observe(video);
+    document.addEventListener('visibilitychange', () => (document.hidden ? video.pause() : intentar()));
+  }
+
+  // ---------- Cuenta regresiva (solo días; se actualiza cada minuto) ----------
+  const cuenta = document.querySelector<HTMLElement>('[data-cuenta]');
+  if (cuenta) {
+    const numero = cuenta.querySelector<HTMLElement>('[data-cuenta-numero]');
+    const inicioEvento = Number(cuenta.dataset.inicio);
+    const finEvento = Number(cuenta.dataset.fin);
+    const pintar = () => {
+      const ahora = Date.now();
+      if (ahora >= finEvento) {
+        cuenta.hidden = true;
+        return;
+      }
+      if (ahora >= inicioEvento) {
+        cuenta.innerHTML = '<span class="cuenta__hoy">Hoy, en el Centro de Convenciones Torreón</span>';
+        cuenta.setAttribute('aria-label', 'Hoy, en el Centro de Convenciones Torreón');
+        return;
+      }
+      const dias = Math.ceil((inicioEvento - ahora) / 86400000);
+      if (numero) numero.textContent = String(dias);
+      cuenta.setAttribute('aria-label', `Faltan ${dias} días para el 9 de junio de 2027`);
+    };
+    pintar();
+    setInterval(pintar, 60000);
+  }
+</script>
+
+<style>
+  /* ================= Preloader =================
+     Todo en CSS (el script del <head> solo pone la clase): el meridiano se
+     dibuja (0–700 ms), aparecen el nombre (500–900 ms) y la fecha (750–1050 ms),
+     y a los 1300 ms el telón se abre en diagonal «/» (400 ms). Tope duro: a
+     los 2 s la capa queda oculta pase lo que pase. */
+  .preloader {
+    display: none;
+  }
+  :global(html.has-preloader) .preloader {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    animation: preloader-salir 0s linear 2s forwards;
+  }
+  .preloader__telon {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(100% + 25vh);
+    background: var(--color-navy);
+    /* Borde derecho en faceta «/». */
+    clip-path: polygon(0 0, 100% 0, calc(100% - 25vh) 100%, 0 100%);
+    animation: preloader-abrir 400ms var(--curva) 1300ms forwards;
+  }
+  .preloader__marco {
+    position: relative;
+    height: 100%;
+  }
+  .preloader__linea {
+    position: absolute;
+    left: 8px;
+    top: calc(var(--cabecera) + 40px);
+    height: 60%;
+    width: 1px;
+    background: var(--color-signal-cyan);
+    transform-origin: top;
+    animation: preloader-linea 700ms var(--curva) both;
+  }
+  .preloader__rotulo {
+    position: absolute;
+    left: 24px;
+    top: calc(var(--cabecera) + 34px);
+    white-space: nowrap;
+    max-width: none;
+    animation:
+      preloader-aparecer 300ms var(--curva) 200ms both,
+      preloader-irse 200ms var(--curva) 1150ms forwards;
+  }
+  .preloader__marca {
+    position: absolute;
+    left: 32px;
+    top: 45%;
+    max-width: min(40rem, calc(100vw - 64px));
+    display: grid;
+    gap: var(--spacing-sm);
+    animation: preloader-irse 200ms var(--curva) 1150ms forwards;
+  }
+  .preloader__nombre {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-lg);
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'wdth' 116;
+    color: var(--color-on-navy);
+    animation: preloader-subir 400ms var(--curva) 500ms both;
+  }
+  .preloader__fecha {
+    font-size: var(--text-label-md);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--color-signal-cyan);
+    animation: preloader-aparecer 300ms var(--curva) 750ms both;
+  }
+  @keyframes preloader-linea {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes preloader-aparecer {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes preloader-subir {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @keyframes preloader-irse {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes preloader-abrir {
+    to {
+      transform: translateX(calc(-100% - 25vh));
+    }
+  }
+  @keyframes preloader-salir {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  /* ================= Portada ================= */
+  .hero {
+    position: relative;
+    min-height: max(680px, 100svh);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .hero__medio {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero__medio :global(picture),
+  .hero__poster,
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .hero__poster,
+  .hero__video {
+    object-fit: cover;
+    object-position: 70% 50%;
+  }
+  .hero__video {
+    opacity: 0;
+    transition: opacity 400ms var(--curva);
+  }
+  .hero__video:global(.activo) {
+    opacity: 1;
+  }
+  /* Velo marino (único degradado permitido): ≥ 0.80 bajo el texto. */
+  .hero__velo {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgb(0 17 47 / 0.85) 0, rgb(0 17 47 / 0.8) var(--cabecera), rgb(0 17 47 / 0) calc(var(--cabecera) + 120px)),
+      linear-gradient(to top, var(--color-navy) 0%, rgb(0 17 47 / 0.85) 22%, rgb(0 17 47 / 0) 48%),
+      linear-gradient(to right, rgb(0 17 47 / 0.92) 0%, rgb(0 17 47 / 0.8) 62%, rgb(0 17 47 / 0.25) 100%);
+  }
+  @media (max-width: 767px) {
+    .hero__velo {
+      background: linear-gradient(to top, var(--color-navy) 0%, rgb(0 17 47 / 0.86) 40%, rgb(0 17 47 / 0.8) 100%);
+    }
+  }
+  .hero__marco {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 100%;
+    padding-top: calc(var(--cabecera) + 40px);
+    padding-bottom: var(--spacing-xl);
+  }
+  .hero__contenido {
+    position: relative;
+  }
+  /* Meridiano de Torreón: móvil a 8 px del borde, alto del bloque de texto. */
+  .hero__meridiano {
+    position: absolute;
+    left: calc(8px - var(--margen));
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-signal-cyan);
+    transform-origin: top;
+  }
+  .hero__h1 {
+    max-width: 16ch;
+  }
+  .hero__datos {
+    margin-top: var(--spacing-lg);
+  }
+  .hero__datos .entrada {
+    margin-top: 4px;
+  }
+  .cuenta {
+    margin-top: var(--spacing-lg);
+    display: grid;
+    grid-template-columns: auto;
+    justify-items: start;
+  }
+  .cuenta__numero {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-lg);
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'wdth' 116;
+    color: var(--color-on-navy);
+  }
+  .cuenta :global(.cuenta__hoy) {
+    font-weight: 600;
+  }
+  .hero__acciones {
+    margin-top: var(--spacing-xl);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-md) var(--spacing-lg);
+  }
+  .hero__pie {
+    position: relative;
+    margin-top: calc(var(--spacing-xl) + 52px);
+  }
+  .hero__pausa {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 8px;
+    border: 0;
+    background: transparent;
+    color: var(--color-on-navy);
+    font: inherit;
+    font-size: var(--text-label-md);
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+  }
+  .hero__pausa[hidden] {
+    display: none;
+  }
+  .hero__pausa-icono {
+    display: inline-flex;
+  }
+  .hero__pausa-icono[hidden] {
+    display: none;
+  }
+  .barra {
+    margin: 0;
+    background: var(--color-navy-panel);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .barra__celda {
+    padding: 20px 24px;
+    min-width: 0;
+  }
+  .barra__celda:nth-child(2n) {
+    border-left: 1px solid var(--color-navy);
+  }
+  .barra__celda:nth-child(n + 3) {
+    border-top: 1px solid var(--color-navy);
+  }
+  .barra dd {
+    margin: 6px 0 0;
+    font-weight: 600;
+  }
+  @media (max-width: 479px) {
+    .barra__celda {
+      padding: 16px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .hero__marco {
+      padding-top: calc(var(--cabecera) + 96px);
+    }
+    .hero__meridiano {
+      left: -24px;
+      /* Baja hasta la barra de datos y toca la celda de la fecha con un tic. */
+      bottom: calc(-1 * (var(--spacing-xl) + 52px + 34px));
+    }
+    .hero__meridiano::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: var(--spacing-tick);
+      height: 1px;
+      background: var(--color-signal-cyan);
+    }
+    /* Hasta 10 columnas: con 8 el h1 de 88 px se iba a 7 líneas y el botón
+       quedaba bajo el pliegue a 1440 × 900. */
+    .hero__h1 {
+      max-width: calc((min(100vw, var(--spacing-container)) - 2 * var(--margen) - 11 * var(--spacing-gutter)) / 12 * 10 + 9 * var(--spacing-gutter));
+    }
+    .hero__fila {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--spacing-2xl);
+      margin-top: var(--spacing-lg);
+    }
+    .hero__fila .hero__datos,
+    .hero__fila .cuenta {
+      margin-top: 0;
+    }
+    .barra {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .barra__celda + .barra__celda {
+      border-left: 1px solid var(--color-navy);
+      border-top: 0;
+    }
+  }
+
+  /* Secuencia de entrada: CSS puro, con retraso si hay preloader. Sin JS
+     (sin html.js) no hay estado inicial oculto. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .hero__meridiano {
+      animation: entra-linea 700ms var(--curva) var(--retraso-linea, 0ms) both;
+    }
+    :global(html.js) .hero__h1 {
+      animation: entra-sube 500ms var(--curva) var(--retraso, 0ms) both;
+    }
+    :global(html.js) .entra {
+      animation: entra-opacidad 200ms var(--curva) calc(var(--retraso, 0ms) + 500ms) both;
+    }
+    :global(html.js) .hero__pie {
+      animation: entra-sube-16 300ms var(--curva) calc(var(--retraso, 0ms) + 700ms) both;
+    }
+    /* Con preloader, la línea del preloader es la que se dibuja: la de la
+       portada queda estática debajo (sin depender del JS). */
+    :global(html.con-preloader) {
+      --retraso: 1300ms;
+    }
+    :global(html.con-preloader) .hero__meridiano {
+      animation: none;
+    }
+  }
+  @keyframes entra-linea {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes entra-sube {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @keyframes entra-sube-16 {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+  @keyframes entra-opacidad {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* ================= Faceta (corte 1:4 con triángulo del color de fondo) ================= */
+  .faceta {
+    position: absolute;
+    background: var(--color-navy);
+    pointer-events: none;
+  }
+  .faceta--izq {
+    left: -1px;
+    top: 0;
+    height: 100%;
+    aspect-ratio: 1 / 4;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  /* ================= Qué es ================= */
+  .conecta {
+    margin: var(--spacing-xl) 0 0;
+  }
+  .conecta > div {
+    padding-block: 16px;
+    border-top: 1px solid var(--color-navy-panel);
+  }
+  .conecta > div:last-child {
+    border-bottom: 1px solid var(--color-navy-panel);
+  }
+  .conecta dt,
+  .ficha dt {
+    font-weight: 600;
+  }
+  .conecta dd,
+  .ficha dd {
+    margin: 4px 0 0;
+    max-width: var(--spacing-measure);
+    color: var(--color-on-navy-muted);
+  }
+  .que-es__texto > p {
+    margin-top: var(--spacing-lg);
+  }
+  .que-es__foto {
+    margin: var(--spacing-xl) 0 0;
+    aspect-ratio: 16 / 10;
+  }
+  .que-es__foto .faceta--izq {
+    display: none;
+  }
+  @media (max-width: 1023px) {
+    .que-es__foto::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: var(--subida);
+      background: var(--color-navy);
+      clip-path: polygon(100% 100%, 0 100%, 0 0);
+    }
+  }
+  @media (min-width: 1024px) {
+    .que-es__texto {
+      width: calc((100% - 11 * var(--spacing-gutter)) / 12 * 6 + 5 * var(--spacing-gutter));
+    }
+    .que-es__foto {
+      position: absolute;
+      margin: 0;
+      top: calc(var(--seccion) / 2);
+      bottom: calc(var(--seccion) / 2);
+      right: 0;
+      /* Desde la columna 7 hasta el borde de la ventana. */
+      left: calc(
+        max(0px, (100% - var(--spacing-container)) / 2) + var(--margen) +
+          (min(100%, var(--spacing-container)) - 2 * var(--margen) - 11 * var(--spacing-gutter)) / 12 * 6 + 6 *
+          var(--spacing-gutter)
+      );
+      aspect-ratio: auto;
+    }
+    .que-es__foto .faceta--izq {
+      display: block;
+    }
+  }
+
+  /* ================= Agenda: línea de tiempo ================= */
+  /* Móvil: línea vertical a la izquierda; escritorio: horizontal arriba de
+     los tres hitos. La línea es cian de 1 px; cada hito cuelga de ella con
+     una marca de 16 px. */
+  .linea-tiempo {
+    position: relative;
+    padding-left: 32px;
+  }
+  .linea-tiempo__hitos {
+    list-style: none;
+    display: grid;
+    gap: var(--spacing-2xl);
+  }
+  .linea-tiempo__linea {
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-signal-cyan);
+    transform-origin: top;
+  }
+  .hito {
+    position: relative;
+    min-width: 0;
+  }
+  .hito__marca {
+    position: absolute;
+    left: -32px;
+    top: calc(var(--text-headline-lg) * 0.5);
+    width: var(--spacing-tick);
+    height: 1px;
+    background: var(--color-signal-cyan);
+  }
+  .hito__fecha {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-lg);
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'wdth' 116;
+    color: var(--color-signal-cyan);
+    max-width: none;
+  }
+  .hito__titulo {
+    margin-top: var(--spacing-sm);
+  }
+  .hito__condicion {
+    margin-top: var(--spacing-sm);
+  }
+  .hito__lista {
+    list-style: none;
+    margin-top: var(--spacing-md);
+  }
+  .hito__lista li {
+    padding-block: 8px;
+    border-top: 1px solid var(--color-navy-panel);
+  }
+  .hito__lista li:last-child {
+    border-bottom: 1px solid var(--color-navy-panel);
+  }
+  .hito__horario {
+    margin-top: var(--spacing-md);
+  }
+  @media (min-width: 1024px) {
+    .linea-tiempo {
+      padding-left: 0;
+      padding-top: 40px;
+    }
+    .linea-tiempo__hitos {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--spacing-gutter);
+    }
+    .linea-tiempo__linea {
+      top: 0;
+      bottom: auto;
+      left: 0;
+      right: 0;
+      width: auto;
+      height: 1px;
+      transform-origin: left;
+    }
+    .hito__marca {
+      left: 0;
+      top: -40px;
+      width: 1px;
+      height: 24px;
+    }
+  }
+  /* Animación: la línea se dibuja al entrar la agenda y los hitos aparecen en
+     orden. Sin JS o con movimiento reducido, todo ya está. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .linea-tiempo__linea {
+      transform: scaleY(0);
+      transition: transform 900ms var(--curva);
+    }
+    :global(html.js) .agenda:global(.revelado) .linea-tiempo__linea {
+      transform: none;
+    }
+    :global(html.js) .hito {
+      opacity: 0;
+      transform: translateY(16px);
+      transition:
+        opacity 400ms var(--curva) calc(300ms + var(--i) * 250ms),
+        transform 400ms var(--curva) calc(300ms + var(--i) * 250ms);
+    }
+    :global(html.js) .agenda:global(.revelado) .hito {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    :global(html.js) .linea-tiempo__linea {
+      transform: scaleX(0);
+    }
+  }
+
+  /* ================= Bandas ================= */
+  .banda {
+    position: relative;
+    min-height: clamp(360px, 40vw, 480px);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .banda__foto,
+  .banda__foto :global(picture),
+  .banda__foto :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .banda__foto :global(img) {
+    object-fit: cover;
+    object-position: 60% 50%;
+  }
+  .banda__velo {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgb(0 17 47 / 0.88) 0%, rgb(0 17 47 / 0.8) 50%, rgb(0 17 47 / 0.2) 100%);
+  }
+  @media (max-width: 767px) {
+    .banda__velo {
+      background: rgb(0 17 47 / 0.8);
+    }
+  }
+  .banda__contenido {
+    position: relative;
+    width: 100%;
+    padding-block: var(--spacing-2xl);
+  }
+  .banda__contenido > * + * {
+    margin-top: var(--spacing-lg);
+  }
+
+  /* ================= B2B ================= */
+  .b2b {
+    display: grid;
+    gap: var(--spacing-xl);
+  }
+  .b2b__recorte {
+    aspect-ratio: 4 / 3;
+  }
+  .b2b__recorte :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .b2b__foto {
+    margin: 0;
+    background: transparent;
+  }
+  .cifras {
+    list-style: none;
+    display: grid;
+    gap: var(--spacing-xl);
+    align-content: center;
+  }
+  .cifras li {
+    display: grid;
+    gap: 4px;
+  }
+  .cifras__numero {
+    font-family: var(--font-display);
+    font-size: var(--text-figure);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-variation-settings: 'wdth' 112;
+    color: var(--color-signal-cyan);
+    max-width: none;
+  }
+  .cifras__prefijo {
+    display: block;
+    font-size: var(--text-headline-md);
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.15;
+    font-variation-settings: 'wdth' 108;
+  }
+  .cifras__unidad {
+    font-size: var(--text-headline-md);
+    letter-spacing: 0;
+    margin-left: 8px;
+  }
+  .cifras__etiqueta {
+    font-size: var(--text-label-md);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--color-on-navy-muted);
+  }
+  .cifras-ancha {
+    border-top: 1px solid var(--color-navy-panel);
+    padding-top: var(--spacing-xl);
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+  @media (min-width: 1024px) {
+    .b2b {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--spacing-gutter);
+      row-gap: var(--spacing-2xl);
+    }
+    .b2b__foto {
+      grid-column: 1 / span 6;
+    }
+    .cifras {
+      grid-column: 8 / span 5;
+    }
+    .cifras-ancha {
+      grid-column: 1 / -1;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: end;
+      column-gap: var(--spacing-xl);
+    }
+    .cifras-ancha .rotulo {
+      grid-column: 1 / -1;
+    }
+    .b2b__panel {
+      grid-column: 1 / span 8;
+    }
+  }
+
+  /* ================= Foro y stage ================= */
+  .foro {
+    display: grid;
+    gap: var(--spacing-xl);
+  }
+  .foro__foto {
+    margin: 0;
+    aspect-ratio: 4 / 3;
+  }
+  .stage {
+    margin-top: var(--spacing-2xl);
+  }
+  .stage__rejilla {
+    margin-top: var(--spacing-xl);
+    display: grid;
+    gap: var(--spacing-md);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stage__foto {
+    grid-column: 1 / -1;
+    margin: 0;
+    aspect-ratio: 4 / 3;
+  }
+  .stage__tema {
+    padding: 24px;
+    min-height: 120px;
+    display: flex;
+    align-items: flex-end;
+  }
+  .stage__titulo {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-md);
+    font-weight: 800;
+    line-height: 1.15;
+    font-variation-settings: 'wdth' 108;
+  }
+  @media (max-width: 479px) {
+    .stage__rejilla {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .stage__tema {
+      min-height: 0;
+    }
+  }
+  .ponentes {
+    margin-top: var(--spacing-2xl);
+  }
+  .ponentes p {
+    margin-top: var(--spacing-md);
+  }
+  @media (min-width: 1024px) {
+    .foro {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--spacing-gutter);
+      align-items: center;
+    }
+    .foro__foto {
+      grid-column: 1 / span 7;
+    }
+    .foro__texto {
+      grid-column: 8 / span 5;
+    }
+    .stage__rejilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-areas:
+        'foto foto t1 t2'
+        'foto foto t3 t4'
+        't5 t5 t6 t6';
+    }
+    .stage__foto {
+      grid-area: foto;
+      aspect-ratio: auto;
+      min-height: 100%;
+    }
+    .stage__tema--1 { grid-area: t1; }
+    .stage__tema--2 { grid-area: t2; }
+    .stage__tema--3 { grid-area: t3; }
+    .stage__tema--4 { grid-area: t4; }
+    .stage__tema--5 { grid-area: t5; }
+    .stage__tema--6 { grid-area: t6; }
+    .stage__tema {
+      min-height: 180px;
+    }
+  }
+
+  /* ================= Visitas ================= */
+  .visitas__par {
+    position: relative;
+    display: grid;
+    gap: 8px;
+  }
+  .visitas__foto {
+    margin: 0;
+    aspect-ratio: 4 / 3;
+  }
+  .visitas__rotulo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 64px var(--margen) 24px;
+    display: grid;
+    gap: 4px;
+    background: linear-gradient(to top, rgb(0 17 47 / 0.92) 0%, rgb(0 17 47 / 0.85) 55%, rgb(0 17 47 / 0) 100%);
+  }
+  .visitas__corte {
+    display: none;
+  }
+  .visitas__pie {
+    margin-top: var(--spacing-md);
+    display: grid;
+    gap: var(--spacing-lg);
+  }
+  .visitas__plantas {
+    margin: 0;
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+  .visitas__plantas > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .visitas__plantas dt {
+    font-weight: 600;
+  }
+  .visitas__plantas dd {
+    margin: 0;
+    color: var(--color-on-navy-muted);
+  }
+  @media (min-width: 768px) {
+    .visitas__par {
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: clamp(420px, 42vw, 600px);
+    }
+    .visitas__foto {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+    .visitas__rotulo {
+      padding-inline: var(--spacing-xl);
+    }
+    .visitas__foto--b .visitas__rotulo {
+      padding-left: calc(var(--spacing-xl) + 80px);
+    }
+    /* Corte de faceta compartido: franja marina «/» de 1:4 del alto. */
+    .visitas__corte {
+      display: block;
+      position: absolute;
+      top: 0;
+      height: 100%;
+      aspect-ratio: 1 / 4;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-navy);
+      clip-path: polygon(calc(100% - 8px) 0, 100% 0, 8px 100%, 0 100%);
+    }
+  }
+
+  /* ================= Boletos ================= */
+  .boletos {
+    display: grid;
+    gap: var(--spacing-2xl);
+  }
+  .boleto__datos {
+    margin-bottom: 0;
+    display: grid;
+    gap: var(--spacing-md);
+  }
+  .boleto__datos dd {
+    margin: 4px 0 0;
+  }
+  .pasos {
+    list-style: none;
+    display: grid;
+    gap: var(--spacing-xl);
+    align-content: start;
+  }
+  .pasos li {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    column-gap: var(--spacing-md);
+    row-gap: var(--spacing-sm);
+  }
+  .pasos__numero {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-lg);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--color-signal-cyan);
+    grid-row: 1 / span 2;
+  }
+  .pasos h3,
+  .pasos p {
+    grid-column: 2;
+  }
+  @media (min-width: 1024px) {
+    .boletos {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--spacing-gutter);
+    }
+    .boleto {
+      grid-column: 1 / span 5;
+      align-self: start;
+    }
+    .pasos {
+      grid-column: 7 / span 6;
+    }
+  }
+
+  /* ================= Organizan ================= */
+  .organizan {
+    display: grid;
+    gap: var(--spacing-xl);
+  }
+  .aliados {
+    margin: var(--spacing-2xl) 0 0;
+    display: grid;
+    gap: var(--spacing-lg);
+    border-top: 1px solid var(--color-navy-panel);
+    padding-top: var(--spacing-xl);
+  }
+  .aliados dd {
+    margin: 6px 0 0;
+    max-width: var(--spacing-measure);
+  }
+  @media (min-width: 1024px) {
+    .organizan {
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--spacing-gutter);
+    }
+    .aliados {
+      grid-template-columns: 2fr 1fr 1fr;
+      column-gap: var(--spacing-gutter);
+    }
+  }
+
+  /* ================= Banda exponer ================= */
+  .banda-exponer {
+    padding-bottom: calc(var(--seccion) / 2 + 16px);
+  }
+  .contacto {
+    list-style: none;
+  }
+  .contacto li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--spacing-sm);
+    row-gap: 4px;
+    min-height: 44px;
+  }
+  .contacto a {
+    font-weight: 600;
+  }
+  @media (min-width: 1024px) {
+    .banda-exponer__cabeza {
+      grid-column: 1 / span 5;
+    }
+    .banda-exponer__texto {
+      grid-column: 7 / span 6;
+    }
+  }
+
+  /* ================= Sede ================= */
+  .ficha {
+    margin: 0;
+    display: grid;
+  }
+  .ficha > div {
+    display: grid;
+    gap: 4px;
+    padding-block: 12px;
+    border-top: 1px solid var(--color-navy-panel);
+  }
+  .ficha > div:last-child {
+    border-bottom: 1px solid var(--color-navy-panel);
+  }
+  @media (min-width: 768px) {
+    .ficha > div {
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: var(--spacing-lg);
+    }
+    .ficha dd {
+      margin: 0;
+    }
+  }
+
+  /* ================= Preguntas ================= */
+  .faq {
+    max-width: 52rem;
+  }
+  .faq__item {
+    border-top: 1px solid var(--color-navy-panel);
+  }
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--color-navy-panel);
+  }
+  .faq__item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding-block: 24px;
+    min-height: 44px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq__icono {
+    flex: none;
+    display: inline-flex;
+    color: var(--color-signal-cyan);
+    transition: transform 200ms var(--curva);
+  }
+  .faq__item[open] .faq__icono {
+    transform: rotate(45deg);
+  }
+  .faq__respuesta {
+    padding-bottom: 24px;
+    max-width: var(--spacing-measure);
+    color: var(--color-on-navy-muted);
+  }
+  .faq__respuesta :global(a) {
+    color: var(--color-on-navy);
+  }
+</style>

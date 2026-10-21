@@ -1,0 +1,13 @@
+dist/
+.astro/
+node_modules/
+# sin slash tambien: git no ignora un *symlink* llamado node_modules con el patron de directorio
+node_modules
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+.vscode/
+.idea/
+*.tar.gz

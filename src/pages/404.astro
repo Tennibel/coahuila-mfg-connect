@@ -1,0 +1,29 @@
+---
+/** 404 con la identidad del sitio y enlaces a lo principal. */
+import PaginaTexto from '../components/PaginaTexto.astro';
+import settings from '../content/settings';
+import { ruta } from '../lib/rutas';
+---
+
+<PaginaTexto
+  titulo="Esta página no existe"
+  tituloPagina="Página no encontrada · Coahuila MFG Connect"
+  descripcion="La página que busca no existe o cambió de dirección."
+  noindex
+  sinCanonical
+  fecha={false}
+>
+  <p class="entrada pagina404">Puede que el enlace esté mal escrito o que la página haya cambiado de dirección.</p>
+  <ul>
+    <li><a class="enlace-suelto" href={ruta('')}>Inicio: fecha, sede y programa</a></li>
+    <li><a class="enlace-suelto" href={ruta('registro/')}>Registro de visitante</a></li>
+    <li><a class="enlace-suelto" href={ruta('#preguntas')}>Preguntas frecuentes</a></li>
+    <li><a class="enlace-suelto" href={`mailto:${settings.contacto.email}`}>{settings.contacto.email}</a></li>
+  </ul>
+</PaginaTexto>
+
+<style>
+  .pagina404 {
+    margin-top: var(--spacing-lg);
+  }
+</style>

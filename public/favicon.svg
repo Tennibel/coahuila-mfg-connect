@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Provisional: el meridiano de Torreón. Se cambia por el logo del evento cuando llegue en vector. -->
+  <rect width="64" height="64" fill="#00112F"/>
+  <line x1="34" y1="38" x2="34" y2="64" stroke="#01F6FA" stroke-width="3"/>
+  <line x1="14" y1="12" x2="34" y2="38" stroke="#F4F7FB" stroke-width="3"/>
+  <circle cx="34" cy="38" r="7" fill="#01F6FA"/>
+</svg>

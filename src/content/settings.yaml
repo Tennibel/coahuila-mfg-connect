@@ -1,0 +1,30 @@
+# ============================================================
+# settings.yaml — Datos del evento (contacto y sede)
+#
+# Solo datos con fuente (agente/hechos.json). Lo que está vacío sale en el
+# sitio como «[pendiente: …]» hasta que el cliente lo mande.
+# ============================================================
+
+negocio:
+  nombre: Coahuila Automotive & Manufacturing Connect
+  nombreCorto: Coahuila MFG Connect
+  descripcionCorta: Encuentro de manufactura de México, Estados Unidos y Canadá. 9 y 10 de junio de 2027, Torreón.
+
+contacto:
+  # WhatsApp: solo dígitos con lada de país (ej. 5218711234567). Vacío = pendiente; el botón flotante no aparece.
+  whatsappNumber: ""
+  whatsappDefaultMessage: Hola, vi el sitio de Coahuila Automotive & Manufacturing Connect y quiero información.
+  email: info@coahuilamfgconnect.com
+  # Teléfono visible. Vacío = pendiente.
+  phone: ""
+
+sede:
+  nombre: Centro de Convenciones Torreón
+  ciudad: Torreón
+  estado: Coahuila
+  # Dirección exacta y enlace de mapa: pendientes del cliente.
+  calle: ""
+  cp: ""
+  mapsUrl: ""
+
+redes: []

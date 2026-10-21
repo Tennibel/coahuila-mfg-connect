@@ -1,0 +1,56 @@
+---
+/** Pie marino, sin meridiano. Sin redes hasta que existan. */
+import settings from '../content/settings';
+import { ruta } from '../lib/rutas';
+---
+
+<footer class="pie">
+  <div class="marco reticula pie__reticula">
+    <div class="pie__datos pila">
+      <p class="pie__nombre">{settings.negocio.nombre}</p>
+      <p>
+        <span class="cifra">9 y 10 de junio de 2027</span>. {settings.sede.nombre}, {settings.sede.ciudad},
+        {settings.sede.estado}.
+      </p>
+      <p>Organizan ANAPSA y ADN de la Manufactura.</p>
+      <p>
+        <a class="enlace-suelto" href={`mailto:${settings.contacto.email}`}>{settings.contacto.email}</a>
+      </p>
+    </div>
+    <nav class="pie__nav" aria-label="Avisos y créditos">
+      <ul class="pie__enlaces">
+        <li><a href={ruta('registro/')}>Registro de visitante</a></li>
+        <li><a href={ruta('aviso-de-privacidad/')}>Aviso de privacidad</a></li>
+        <li><a href={ruta('terminos/')}>Términos de uso y del boleto</a></li>
+        <li><a href={ruta('creditos/')}>Créditos e imágenes</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    background: var(--color-navy);
+    border-top: 1px solid var(--color-navy-panel);
+    padding-block: var(--spacing-2xl);
+  }
+  .pie__nombre {
+    font-weight: 600;
+  }
+  .pie__enlaces {
+    list-style: none;
+  }
+  .pie__enlaces a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  @media (min-width: 1024px) {
+    .pie__datos {
+      grid-column: 1 / span 7;
+    }
+    .pie__nav {
+      grid-column: 9 / span 4;
+    }
+  }
+</style>

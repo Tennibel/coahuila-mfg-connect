@@ -1,0 +1,9 @@
+---
+/** Marca de dato pendiente del cliente: visible a propósito («[pendiente: …]»). */
+interface Props {
+  texto: string;
+}
+const { texto } = Astro.props;
+---
+
+<span class="pendiente">[pendiente: {texto}]</span>

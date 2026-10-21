@@ -1,0 +1,30 @@
+---
+/**
+ * Seccion.astro — sección de contenido sobre marino. Cabecera: solo h2 y, si
+ * hay, una entrada en body-lg (sin insignia ni subtítulo). Sin meridiano.
+ */
+interface Props {
+  id: string;
+  titulo: string;
+  entrada?: string;
+  clase?: string;
+  /** Revelado en faceta de la cabecera (solo secciones con foto). */
+  revelar?: boolean;
+}
+const { id, titulo, entrada, clase = '', revelar = false } = Astro.props;
+---
+
+<section id={id} class:list={['seccion', clase]} aria-labelledby={`${id}-titulo`}>
+  <slot name="antes" />
+  <div class="marco">
+    <div class="cabeza-seccion" data-revelar={revelar ? '' : undefined}>
+      <h2 id={`${id}-titulo`}>{titulo}</h2>
+      {entrada && <p class="entrada">{entrada}</p>}
+      <slot name="cabeza" />
+    </div>
+    <slot />
+  </div>
+  <slot name="despues" />
+</section>
+
+

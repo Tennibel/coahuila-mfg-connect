@@ -1,0 +1,109 @@
+---
+/**
+ * Aviso de privacidad integral (LFPDPPP). Borrador para que el cliente lo
+ * valide; no es asesoría jurídica. Describe el registro tal como funcionará
+ * con cobro (Mercado Pago, QR, hoja de registro) y aclara que hoy la página
+ * de registro es una vista previa que no guarda datos.
+ */
+import PaginaTexto from '../components/PaginaTexto.astro';
+import Pendiente from '../components/Pendiente.astro';
+import theme from '../theme.config';
+import { responsable, domicilio, correoPrivacidad, nombreComercial, datosFormulario } from '../lib/legal';
+import { ruta } from '../lib/rutas';
+
+const correo = correoPrivacidad();
+const pend = (s: string) => s.startsWith('[pendiente:');
+---
+
+<PaginaTexto
+  titulo="Aviso de privacidad"
+  tituloPagina="Aviso de privacidad · Coahuila MFG Connect"
+  descripcion="Cómo se tratan los datos personales de quienes se registran como visitantes en Coahuila Automotive & Manufacturing Connect."
+  noindex
+  claro
+>
+  <p class="entrada">
+    Este sitio está en vista previa: el formulario de registro todavía no envía, no cobra y no guarda ningún dato.
+    Este aviso describe cómo se tratarán los datos cuando el registro esté activo.
+  </p>
+
+  <h2>Quién es responsable de sus datos</h2>
+  <p>
+    {pend(responsable()) ? <Pendiente texto="razón social del responsable de los datos" /> : responsable()}, con
+    domicilio en {pend(domicilio()) ? <Pendiente texto="domicilio del responsable" /> : domicilio()}, es responsable del
+    tratamiento de los datos personales que usted proporcione al registrarse en <strong>{nombreComercial}</strong> a
+    través de <strong>{theme.domain}</strong>, conforme a la Ley Federal de Protección de Datos Personales en Posesión de
+    los Particulares.
+  </p>
+
+  <h2>Qué datos recabamos</h2>
+  <p>Al registrarse como visitante le pediremos:</p>
+  <ul>
+    {datosFormulario.map((d) => <li>{d}</li>)}
+  </ul>
+  <p>
+    El pago lo procesa Mercado Pago. Los datos de su tarjeta o de su pago los recibe Mercado Pago directamente; nosotros
+    solo recibimos el estado del pago y su folio. No solicitamos datos personales sensibles.
+  </p>
+  <p>Si nos escribe por correo, tratamos los datos que usted comparta en esa conversación.</p>
+
+  <h2>Para qué usamos sus datos</h2>
+  <p>Finalidades necesarias:</p>
+  <ul>
+    <li>Registrarle como visitante, confirmar su pago y enviarle por correo su QR de acceso.</li>
+    <li>Si paga en efectivo, enviarle las instrucciones de pago y liberar el lugar si la ficha vence.</li>
+    <li>Controlar el acceso al evento el 9 y 10 de junio de 2027.</li>
+    <li>Atender sus dudas, cambios o aclaraciones sobre su registro.</li>
+  </ul>
+  <p>Finalidades adicionales, que no son necesarias para su registro:</p>
+  <ul>
+    <li>Enviarle información de próximas ediciones y de actividades de los organizadores.</li>
+    <li>Elaborar estadísticas del perfil de los asistentes.</li>
+  </ul>
+  <p>
+    Si no desea que usemos sus datos para las finalidades adicionales, escríbanos a
+    {pend(correo) ? <Pendiente texto="correo para datos personales" /> : <a href={`mailto:${correo}`}>{correo}</a>}.
+    Su negativa no afecta su registro.
+  </p>
+
+  <h2>Con quién compartimos sus datos</h2>
+  <p>
+    No vendemos sus datos. Los comparten, solo para los fines de este aviso: los organizadores del evento (ANAPSA y ADN
+    de la Manufactura) y los proveedores que nos ayudan a operar el registro, que tratan los datos por nuestra cuenta:
+  </p>
+  <ul>
+    <li>Mercado Pago, que procesa el pago.</li>
+    <li>El servicio de correo con el que le enviamos su QR.</li>
+    <li>Google, donde se lleva la hoja de registro de asistentes.</li>
+    <li>El proveedor de alojamiento del sitio.</li>
+  </ul>
+  <p>
+    Otras transferencias (por ejemplo, a expositores o patrocinadores): <Pendiente texto="confirmar si habrá alguna; si la hay, requiere su consentimiento" />.
+  </p>
+
+  <h2>Cuánto tiempo conservamos sus datos</h2>
+  <p><Pendiente texto="plazo de conservación después del evento" /></p>
+
+  <h2>Sus derechos ARCO</h2>
+  <p>
+    Usted puede acceder a sus datos, rectificarlos, cancelarlos u oponerse a su uso (derechos ARCO), así como revocar su
+    consentimiento o limitar el uso de sus datos. Envíe su solicitud a
+    {pend(correo) ? <Pendiente texto="correo para datos personales" /> : <a href={`mailto:${correo}`}>{correo}</a>} con:
+  </p>
+  <ul>
+    <li>Su nombre y un medio para responderle.</li>
+    <li>Un documento que acredite su identidad o, en su caso, la de su representante.</li>
+    <li>La descripción clara de los datos y del derecho que desea ejercer.</li>
+  </ul>
+  <p>Le responderemos dentro de los plazos que establece la ley.</p>
+
+  <h2>Cookies</h2>
+  <p>
+    Este sitio no usa cookies de analítica ni de publicidad. Si en el futuro se instalan, se pedirá su consentimiento
+    antes de activarlas y se explicará aquí.
+  </p>
+
+  <h2>Cambios a este aviso</h2>
+  <p>Cualquier cambio se publicará en esta página con su fecha de actualización.</p>
+  <p><a class="enlace-suelto" href={ruta('terminos/')}>Términos de uso y del boleto</a></p>
+</PaginaTexto>

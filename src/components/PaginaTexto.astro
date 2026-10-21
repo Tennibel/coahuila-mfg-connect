@@ -1,0 +1,71 @@
+---
+/**
+ * PaginaTexto.astro — avisos legales (sección clara), créditos y 404 (marino).
+ * Una columna de texto; sin meridiano (v2: solo preloader, portada y agenda).
+ */
+import Layout from '../layouts/Layout.astro';
+import { fechaActualizacion } from '../lib/legal';
+
+interface Props {
+  titulo: string;
+  tituloPagina: string;
+  descripcion: string;
+  noindex?: boolean;
+  fecha?: boolean;
+  sinCanonical?: boolean;
+  claro?: boolean;
+}
+const { titulo, tituloPagina, descripcion, noindex = false, fecha = true, sinCanonical = false, claro = false } =
+  Astro.props;
+---
+
+<Layout title={tituloPagina} description={descripcion} noindex={noindex} sinCanonical={sinCanonical}>
+  <div class:list={['pagina', { claro }]}>
+    <div class="marco">
+      <div class="texto">
+        <h1>{titulo}</h1>
+        {fecha && <p class="nota texto__fecha">Última actualización: {fechaActualizacion()}</p>}
+        <slot />
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .pagina {
+    padding-block: var(--spacing-2xl) var(--seccion);
+    height: 100%;
+  }
+  .texto {
+    max-width: 46rem;
+  }
+  .texto :global(h1) {
+    font-size: var(--text-headline-lg);
+    line-height: 1.04;
+  }
+  .texto__fecha {
+    margin-top: var(--spacing-md);
+  }
+  .texto :global(h2) {
+    font-size: var(--text-headline-md);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 108;
+    letter-spacing: 0;
+    line-height: 1.15;
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+  }
+  .texto :global(p),
+  .texto :global(ul) {
+    margin-bottom: var(--spacing-md);
+  }
+  .texto :global(ul) {
+    list-style: disc;
+    padding-left: 1.25rem;
+    max-width: var(--spacing-measure);
+  }
+  .texto :global(li) {
+    margin-bottom: 6px;
+    max-width: var(--spacing-measure);
+  }
+</style>

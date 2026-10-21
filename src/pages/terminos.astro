@@ -1,0 +1,66 @@
+---
+/**
+ * Términos de uso del sitio y del boleto de visitante. Borrador con pendientes
+ * visibles: el cliente define cambios, cancelación, reembolso y transferencia.
+ * Cubre también el aviso legal (titular del sitio y condiciones de uso).
+ */
+import PaginaTexto from '../components/PaginaTexto.astro';
+import Pendiente from '../components/Pendiente.astro';
+import theme from '../theme.config';
+import settings from '../content/settings';
+import { responsable, domicilio, nombreComercial } from '../lib/legal';
+import { ruta } from '../lib/rutas';
+
+const pend = (s: string) => s.startsWith('[pendiente:');
+---
+
+<PaginaTexto
+  titulo="Términos de uso y del boleto"
+  tituloPagina="Términos de uso y del boleto · Coahuila MFG Connect"
+  descripcion="Titular del sitio, condiciones de uso y condiciones del boleto de visitante de Coahuila Automotive & Manufacturing Connect."
+  noindex
+  claro
+>
+  <h2>Titular del sitio</h2>
+  <p>
+    Este sitio, sobre el evento <strong>{nombreComercial}</strong>, pertenece a
+    {pend(responsable()) ? <Pendiente texto="razón social del titular" /> : responsable()}, con domicilio en
+    {pend(domicilio()) ? <Pendiente texto="domicilio del titular" /> : domicilio()}. Dominio definitivo:
+    {theme.domain}. Contacto: <a href={`mailto:${settings.contacto.email}`}>{settings.contacto.email}</a>.
+  </p>
+
+  <h2>Uso del sitio</h2>
+  <p>
+    El sitio informa sobre el evento del 9 y 10 de junio de 2027 en el Centro de Convenciones Torreón. Los temas del
+    programa son previstos y las visitas industriales son propuestas, sujetas a la autorización y disponibilidad de las
+    plantas; ambos pueden cambiar. Las cifras de citas, proveedores y compradores son metas del evento.
+  </p>
+  <p>
+    Los nombres de empresas, cámaras y organismos se mencionan solo para identificarlos; sus marcas pertenecen a sus
+    titulares.
+  </p>
+
+  <h2>El boleto de visitante</h2>
+  <ul>
+    <li>Precio: <Pendiente texto="precio del boleto" />.</li>
+    <li>Qué incluye: <Pendiente texto="exposición, foro y stage; las citas B2B son para expositores" />.</li>
+    <li>
+      Pago: en línea con Mercado Pago. El QR individual se envía por correo cuando el pago queda aprobado. En pagos en
+      efectivo, si la ficha vence sin pagarse, el lugar se libera.
+    </li>
+    <li>Cambios, cancelación y reembolso: <Pendiente texto="política del cliente" />.</li>
+    <li>Transferencia del boleto a otra persona: <Pendiente texto="si se permite y cómo" />.</li>
+    <li>Factura: <Pendiente texto="si se factura y cómo se pide" />.</li>
+    <li>Requisitos de acceso: <Pendiente texto="edad mínima, perfil profesional, gafete e identificación" />.</li>
+    <li>Cupo máximo y fechas de registro: <Pendiente texto="cupo y apertura y cierre del registro" />.</li>
+  </ul>
+
+  <h2>Datos personales</h2>
+  <p>El tratamiento de sus datos se describe en el <a href={ruta('aviso-de-privacidad/')}>aviso de privacidad</a>.</p>
+
+  <h2>Legislación aplicable</h2>
+  <p>
+    Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se
+    someten a los tribunales competentes de <Pendiente texto="ciudad de jurisdicción" />.
+  </p>
+</PaginaTexto>

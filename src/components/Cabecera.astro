@@ -1,0 +1,204 @@
+---
+/**
+ * Cabecera — nombre del evento en texto (el logo en vector está pendiente) y
+ * navegación por anclas, en tipo oración. En la portada es fija y
+ * transparente sobre el video; al bajar pasa a marino sólido con un filete de
+ * 1 px. En las demás páginas es marina desde el inicio.
+ */
+import settings from '../content/settings';
+import { ruta } from '../lib/rutas';
+import Icono from './Icono.astro';
+
+interface Props {
+  sobrePortada?: boolean;
+}
+const { sobrePortada = false } = Astro.props;
+
+const enlaces = [
+  { href: ruta('#agenda'), texto: 'Agenda' },
+  { href: ruta('#b2b'), texto: 'B2B' },
+  { href: ruta('#programa'), texto: 'Foro y stage' },
+  { href: ruta('#visitas'), texto: 'Visitas' },
+  { href: ruta('#boletos'), texto: 'Boletos' },
+  { href: ruta('#sede'), texto: 'Sede' },
+  { href: ruta('#preguntas'), texto: 'Preguntas' },
+];
+---
+
+<header class:list={['cabecera', { 'cabecera--portada': sobrePortada }]} data-cabecera>
+  <div class="marco cabecera__fila">
+    <a class="cabecera__nombre" href={ruta('')}>
+      {settings.negocio.nombre}
+    </a>
+
+    <nav class="cabecera__nav" aria-label="Principal">
+      <ul>
+        {enlaces.map((e) => <li><a href={e.href}>{e.texto}</a></li>)}
+        <li><a class="cabecera__registro" href={ruta('registro/')}>Registro</a></li>
+      </ul>
+    </nav>
+
+    <details class="cabecera__menu">
+      <summary>
+        <span class="icono-abrir"><Icono nombre="list" tamano={24} /></span>
+        <span class="icono-cerrar"><Icono nombre="x" tamano={24} /></span>
+        <span>Menú</span>
+      </summary>
+      <nav aria-label="Principal (móvil)">
+        <ul>
+          {enlaces.map((e) => <li><a href={e.href}>{e.texto}</a></li>)}
+          <li><a href={ruta('registro/')}>Registro de visitante</a></li>
+        </ul>
+      </nav>
+    </details>
+  </div>
+</header>
+
+{
+  sobrePortada && (
+    <script>
+      const cab = document.querySelector<HTMLElement>('[data-cabecera]');
+      if (cab) {
+        const poner = () => cab.classList.toggle('cabecera--solida', window.scrollY > 24);
+        poner();
+        window.addEventListener('scroll', poner, { passive: true });
+        // Al abrir el menú en móvil, fondo sólido para que se lea.
+        cab.querySelector('details')?.addEventListener('toggle', (e) => {
+          cab.classList.toggle('cabecera--menu', (e.target as HTMLDetailsElement).open);
+        });
+      }
+    </script>
+  )
+}
+
+<style>
+  .cabecera {
+    position: relative;
+    z-index: 40;
+    background: var(--color-navy);
+    border-bottom: 1px solid var(--color-navy-panel);
+  }
+  .cabecera--portada {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: transparent;
+    border-bottom-color: transparent;
+  }
+  /* El fondo sólido entra con opacidad (no se anima el color de fondo). */
+  .cabecera--portada::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-navy);
+    border-bottom: 1px solid var(--color-navy-panel);
+    opacity: 0;
+    transition: opacity 200ms var(--curva);
+  }
+  .cabecera--solida::before,
+  .cabecera--menu::before {
+    opacity: 1;
+  }
+  .cabecera__fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    min-height: var(--cabecera);
+  }
+  .cabecera__nombre {
+    font-weight: 600;
+    color: var(--color-on-navy);
+    text-decoration: none;
+    line-height: 1.25;
+    max-width: 22ch;
+    padding-block: 12px;
+  }
+  .cabecera__nombre:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-signal-cyan);
+  }
+  .cabecera__nav {
+    display: none;
+  }
+  .cabecera__nav ul,
+  .cabecera__menu ul {
+    list-style: none;
+  }
+  .cabecera__nav ul {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .cabecera__nav a,
+  .cabecera__menu nav a {
+    font-size: var(--text-label-md);
+    font-weight: 600;
+    color: var(--color-on-navy);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .cabecera__nav a:hover,
+  .cabecera__menu nav a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-signal-cyan);
+    text-decoration-thickness: 2px;
+  }
+  .cabecera__nav .cabecera__registro {
+    text-decoration: underline;
+    text-decoration-color: var(--color-signal-cyan);
+  }
+  .cabecera__menu summary {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-height: 44px;
+    padding-inline: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: var(--text-label-md);
+  }
+  .cabecera__menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .icono-cerrar,
+  .cabecera__menu[open] .icono-abrir {
+    display: none;
+  }
+  .cabecera__menu[open] .icono-cerrar,
+  .icono-abrir {
+    display: inline-flex;
+  }
+  .cabecera__menu nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: var(--color-navy);
+    border-bottom: 1px solid var(--color-navy-panel);
+    padding: var(--spacing-sm) var(--margen) var(--spacing-lg);
+  }
+  .cabecera__menu nav li {
+    border-top: 1px solid var(--color-navy-panel);
+  }
+  .cabecera__menu nav a {
+    width: 100%;
+    justify-content: flex-start;
+    font-size: var(--text-body-md);
+  }
+  @media (min-width: 1100px) {
+    .cabecera__nav {
+      display: block;
+    }
+    .cabecera__menu {
+      display: none;
+    }
+  }
+</style>

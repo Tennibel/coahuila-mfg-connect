@@ -1,0 +1,504 @@
+---
+/**
+ * /registro — formulario de visitante en VISTA PREVIA.
+ *
+ * Vive en GitHub Pages: no cobra, no guarda y no envía nada. Lo dice arriba y
+ * junto al botón. Al «enviar» valida en el navegador y muestra lo que pasaría
+ * con el registro activo (Mercado Pago → QR por correo → acceso) y un QR de
+ * MUESTRA que no se puede escanear. Nunca dice «ya está registrado».
+ *
+ * Sin JavaScript el botón queda desactivado: así el formulario no puede
+ * mandar datos en la URL. Cuando exista el servidor de cobro, este formulario
+ * se conecta ahí (con validación en servidor, límite por IP y el campo trampa).
+ */
+import Layout from '../layouts/Layout.astro';
+import Pendiente from '../components/Pendiente.astro';
+import { ruta } from '../lib/rutas';
+
+const areas = ['Compras', 'Desarrollo de proveedores', 'Ingeniería', 'Manufactura', 'Operaciones', 'Dirección de planta', 'Otra'];
+const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
+
+---
+
+<Layout
+  title="Registro de visitante (vista previa) · Coahuila MFG Connect"
+  description="Vista previa del registro de visitante de Coahuila Automotive & Manufacturing Connect. Todavía no cobra ni guarda datos."
+  noindex
+>
+  <!-- Cabecera marina corta: h1 + aviso de vista previa -->
+  <div class="registro__cabeza">
+    <div class="marco reticula">
+      <div class="col-contenido pila-lg">
+        <h1>Registro de visitante</h1>
+        <p class="entrada">
+          9 y 10 de junio de 2027, Centro de Convenciones Torreón. Expositores y patrocinadores:
+          <a href={ruta('#expositores')}>escríbanos</a>, no se registran aquí.
+        </p>
+        <p class="aviso-previa" role="note">
+          <span class="rotulo aviso-previa__rotulo">Vista previa</span>
+          Este formulario todavía no cobra ni guarda datos. Puede llenarlo para ver cómo funcionará; no se enviará nada.
+        </p>
+      </div>
+      <div class="col-margen registro__margen nota pila">
+        <p>Boleto de visitante: <Pendiente texto="precio y qué incluye" /></p>
+        <p>Las citas B2B son para expositores.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario en sección clara -->
+  <div class="pagina claro registro__claro">
+    <div class="marco">
+      <div class="reticula">
+        <div class="col-contenido">
+          <form id="form-registro" class="form" novalidate aria-describedby="nota-previa">
+            <fieldset>
+              <legend class="form__grupo">Sus datos</legend>
+              <div class="form__fila">
+                <div class="campo">
+                  <label for="nombre">Nombre(s)</label>
+                  <input id="nombre" name="nombre" type="text" autocomplete="given-name" required data-error="Escriba su nombre." />
+                  <p class="campo__error" id="nombre-error" hidden></p>
+                </div>
+                <div class="campo">
+                  <label for="apellidos">Apellidos</label>
+                  <input id="apellidos" name="apellidos" type="text" autocomplete="family-name" required data-error="Escriba sus apellidos." />
+                  <p class="campo__error" id="apellidos-error" hidden></p>
+                </div>
+              </div>
+              <div class="form__fila">
+                <div class="campo">
+                  <label for="correo">Correo electrónico</label>
+                  <input id="correo" name="correo" type="email" autocomplete="email" inputmode="email" required data-error="Escriba un correo válido, por ejemplo nombre@empresa.com." />
+                  <p class="campo__ayuda">Aquí le llegaría su QR.</p>
+                  <p class="campo__error" id="correo-error" hidden></p>
+                </div>
+                <div class="campo">
+                  <label for="telefono">Teléfono</label>
+                  <input id="telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" required pattern={"[0-9 +\\(\\)\\-]{8,20}"} data-error="Escriba un teléfono de al menos 8 dígitos, con lada." />
+                  <p class="campo__error" id="telefono-error" hidden></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend class="form__grupo">Su empresa</legend>
+              <div class="form__fila">
+                <div class="campo">
+                  <label for="empresa">Empresa</label>
+                  <input id="empresa" name="empresa" type="text" autocomplete="organization" required data-error="Escriba el nombre de su empresa." />
+                  <p class="campo__error" id="empresa-error" hidden></p>
+                </div>
+                <div class="campo">
+                  <label for="cargo">Cargo</label>
+                  <input id="cargo" name="cargo" type="text" autocomplete="organization-title" required data-error="Escriba su cargo." />
+                  <p class="campo__error" id="cargo-error" hidden></p>
+                </div>
+              </div>
+              <div class="form__fila">
+                <div class="campo">
+                  <label for="area">Área en la que trabaja</label>
+                  <select id="area" name="area" required data-error="Elija su área.">
+                    <option value="">Elija una opción</option>
+                    {areas.map((a) => <option>{a}</option>)}
+                  </select>
+                  <p class="campo__error" id="area-error" hidden></p>
+                </div>
+                <div class="campo">
+                  <label for="pais">País</label>
+                  <select id="pais" name="pais" autocomplete="country-name" required data-error="Elija su país.">
+                    <option value="">Elija una opción</option>
+                    {paises.map((p) => <option>{p}</option>)}
+                  </select>
+                  <p class="campo__error" id="pais-error" hidden></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="opciones" data-grupo="pago" data-error="Elija cómo pagaría.">
+              <legend class="form__grupo">Boleto y pago</legend>
+              <p class="opciones__boleto">
+                Boleto de visitante: <Pendiente texto="precio" />
+              </p>
+              <label class="opcion" for="pago-tarjeta">
+                <input id="pago-tarjeta" type="radio" name="pago" value="Tarjeta de crédito o débito" required />
+                <span>Tarjeta de crédito o débito, con Mercado Pago</span>
+              </label>
+              <label class="opcion" for="pago-efectivo">
+                <input id="pago-efectivo" type="radio" name="pago" value="Efectivo en tienda de conveniencia" />
+                <span>Efectivo en tienda de conveniencia, con Mercado Pago</span>
+              </label>
+              <p class="campo__error" id="pago-error" hidden></p>
+            </fieldset>
+
+            <!-- Campo trampa antispam: invisible para personas. -->
+            <div class="trampa" aria-hidden="true">
+              <label for="sitio_web">No llene este campo</label>
+              <input id="sitio_web" name="sitio_web" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <label class="opcion opcion--acepto" for="acepto">
+              <input id="acepto" name="acepto" type="checkbox" required data-error="Para continuar, confirme que leyó el aviso de privacidad." />
+              <span>
+                Leí el <a href={ruta('aviso-de-privacidad/')}>aviso de privacidad</a> y acepto el tratamiento de mis datos para
+                registrarme.
+              </span>
+            </label>
+            <p class="campo__error" id="acepto-error" hidden></p>
+
+            <div class="form__envio">
+              <p class="aviso-corto" id="nota-previa">
+                Vista previa: este formulario todavía no cobra ni guarda datos.
+              </p>
+              <button class="boton" type="submit" disabled data-cta="revisar_registro" data-cta-location="registro">
+                Revisar mi registro
+              </button>
+              <noscript>
+                <p class="nota">Para usar la vista previa del formulario, active JavaScript en su navegador.</p>
+              </noscript>
+            </div>
+          </form>
+
+          <section id="resultado" class="resultado" hidden tabindex="-1" aria-labelledby="resultado-titulo">
+            <h2 id="resultado-titulo">No se envió nada: así seguiría su registro</h2>
+            <p class="entrada">
+              Esto es una vista previa. No se cobró, no se guardó ningún dato y no recibirá ningún correo. Cuando el
+              registro esté activo, pasaría esto:
+            </p>
+            <ol class="resultado__pasos">
+              <li>
+                <span class="fuerte">Pago.</span> Le llevaríamos a Mercado Pago para pagar su boleto con
+                <span data-resumen="pago"></span>.
+              </li>
+              <li>
+                <span class="fuerte">QR por correo.</span> Cuando el pago quedara aprobado, le llegaría a
+                <span class="fuerte" data-resumen="correo"></span> un QR individual.
+                <span data-resumen="efectivo" hidden>Con pago en efectivo, primero recibiría las instrucciones; si la ficha vence sin pagarse, el lugar se libera.</span>
+              </li>
+              <li>
+                <span class="fuerte">Acceso.</span> Presentaría el QR en el Centro de Convenciones Torreón el 9 o el 10 de
+                junio de 2027.
+              </li>
+            </ol>
+
+            <figure class="muestra">
+              <svg class="muestra__dibujo" viewBox="0 0 240 150" width="240" height="150" role="img" aria-labelledby="muestra-texto">
+                <title id="muestra-texto">Dibujo de un sobre de correo: aquí llegará su QR</title>
+                <rect x="1" y="1" width="238" height="148" rx="3" fill="#F4F7FB" stroke="#4A5B70" stroke-width="2" stroke-dasharray="6 6"></rect>
+                <path d="M70 48h100v62H70z" fill="none" stroke="#095CE4" stroke-width="3" stroke-linejoin="round"></path>
+                <path d="M70 48l50 36 50-36" fill="none" stroke="#095CE4" stroke-width="3" stroke-linejoin="round"></path>
+              </svg>
+              <figcaption class="fuerte">Aquí llegará su QR</figcaption>
+              <p class="nota">Cuando el registro esté activo, su QR individual le llegará por correo. Esto no es un boleto.</p>
+            </figure>
+
+            <dl class="resumen" aria-label="Datos que escribió (no se guardaron)">
+              <div><dt>Nombre</dt><dd data-resumen="nombre"></dd></div>
+              <div><dt>Empresa y cargo</dt><dd data-resumen="empresa"></dd></div>
+              <div><dt>Área y país</dt><dd data-resumen="area"></dd></div>
+            </dl>
+
+            <p>
+              <button type="button" class="enlace-boton" id="volver">Volver al formulario</button>
+            </p>
+          </section>
+        </div>
+        <div class="col-margen nota pila registro__ayuda">
+          <p>Pago con Mercado Pago cuando el registro esté activo.</p>
+          <p>QR individual por correo cuando el pago queda aprobado.</p>
+          <p>
+            Dudas: <a class="enlace-suelto" href="mailto:info@coahuilamfgconnect.com">info@coahuilamfgconnect.com</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById('form-registro') as HTMLFormElement | null;
+  const resultado = document.getElementById('resultado') as HTMLElement | null;
+  const volver = document.getElementById('volver');
+
+  if (form && resultado) {
+    const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (boton) boton.disabled = false;
+
+    const mostrarError = (id: string, mensaje: string, control?: HTMLElement | null) => {
+      const p = document.getElementById(`${id}-error`);
+      if (!p) return;
+      p.textContent = mensaje;
+      p.hidden = !mensaje;
+      if (control) {
+        control.setAttribute('aria-invalid', mensaje ? 'true' : 'false');
+        if (mensaje) control.setAttribute('aria-describedby', `${id}-error`);
+        else control.removeAttribute('aria-describedby');
+      }
+    };
+
+    const validar = (): HTMLElement | null => {
+      let primero: HTMLElement | null = null;
+      form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[data-error], select[data-error]').forEach((c) => {
+        if (c.type === 'text' || c.type === 'email' || c.type === 'tel') c.value = c.value.trim();
+        const ok = c.checkValidity();
+        mostrarError(c.id, ok ? '' : c.dataset.error ?? 'Revise este campo.', c);
+        if (!ok && !primero) primero = c;
+      });
+      const grupo = form.querySelector<HTMLElement>('[data-grupo="pago"]');
+      const pago = form.querySelector<HTMLInputElement>('input[name="pago"]:checked');
+      mostrarError('pago', pago ? '' : grupo?.dataset.error ?? '', null);
+      if (!pago && !primero) primero = form.querySelector<HTMLInputElement>('input[name="pago"]');
+      return primero;
+    };
+
+    form.addEventListener('input', (e) => {
+      const c = e.target as HTMLInputElement;
+      if (c.getAttribute('aria-invalid') === 'true' && c.checkValidity()) mostrarError(c.id, '', c);
+      if (c.name === 'pago') mostrarError('pago', '', null);
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fallo = validar();
+      if (fallo) {
+        fallo.focus();
+        return;
+      }
+      // Campo trampa lleno: no se muestra nada (un robot no necesita la vista previa).
+      const trampa = form.querySelector<HTMLInputElement>('#sitio_web');
+      if (trampa && trampa.value) return;
+
+      const v = (n: string) => (form.elements.namedItem(n) as HTMLInputElement | null)?.value ?? '';
+      const pago = form.querySelector<HTMLInputElement>('input[name="pago"]:checked')?.value ?? '';
+      const poner = (clave: string, texto: string) =>
+        resultado.querySelectorAll<HTMLElement>(`[data-resumen="${clave}"]`).forEach((el) => (el.textContent = texto));
+      poner('pago', pago.toLowerCase());
+      poner('correo', v('correo'));
+      poner('nombre', `${v('nombre')} ${v('apellidos')}`);
+      poner('empresa', `${v('empresa')}, ${v('cargo')}`);
+      poner('area', `${v('area')}, ${v('pais')}`);
+      const efectivo = resultado.querySelector<HTMLElement>('[data-resumen="efectivo"]');
+      if (efectivo) efectivo.hidden = !/efectivo/i.test(pago);
+
+      form.hidden = true;
+      resultado.hidden = false;
+      resultado.focus();
+    });
+
+    volver?.addEventListener('click', () => {
+      resultado.hidden = true;
+      form.hidden = false;
+      form.querySelector<HTMLInputElement>('#nombre')?.focus();
+    });
+  }
+</script>
+
+<style>
+  h1 {
+    font-size: var(--text-headline-lg);
+    line-height: 1.04;
+  }
+  .registro__cabeza {
+    padding-block: var(--spacing-2xl) var(--spacing-xl);
+  }
+  .registro__claro {
+    padding-block: var(--spacing-2xl) var(--seccion);
+  }
+  .col-contenido,
+  .col-margen {
+    min-width: 0;
+  }
+  .registro__margen {
+    align-self: end;
+  }
+  .aviso-previa {
+    font-weight: 600;
+    max-width: calc(var(--spacing-measure) + 48px);
+    background: var(--color-navy-panel);
+    padding: 16px 24px;
+  }
+  @media (min-width: 1024px) {
+    .col-contenido {
+      grid-column: 1 / span 8;
+    }
+    .col-margen {
+      grid-column: 9 / span 4;
+    }
+  }
+  .aviso-previa__rotulo {
+    display: block;
+    color: var(--color-signal-cyan);
+    margin-bottom: 4px;
+  }
+
+  .form fieldset {
+    border: 0;
+    margin: 0 0 var(--spacing-xl);
+    padding: 0;
+    min-width: 0;
+  }
+  .form__grupo {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-md);
+    font-weight: 700;
+    font-variation-settings: 'wdth' 106;
+    line-height: 1.15;
+    padding: 0;
+    margin-bottom: var(--spacing-md);
+  }
+  .form__fila {
+    display: grid;
+    gap: var(--spacing-md);
+  }
+  .form__fila + .form__fila {
+    margin-top: var(--spacing-md);
+  }
+  @media (min-width: 640px) {
+    .form__fila {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacing-lg);
+    }
+  }
+  .campo {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+    min-width: 0;
+  }
+  .campo label {
+    font-weight: 600;
+  }
+  .campo input,
+  .campo select {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-on-surface-muted);
+    border-radius: var(--radius-sm);
+    background: var(--color-neutral);
+    color: var(--color-on-surface);
+    font: inherit;
+  }
+  .campo input:focus-visible,
+  .campo select:focus-visible {
+    outline: 0;
+    border: 2px solid var(--color-primary);
+    padding: 11px 13px;
+  }
+  .campo [aria-invalid='true'] {
+    border-color: var(--color-error);
+  }
+  .campo__ayuda,
+  .campo__error {
+    font-size: var(--text-label-md);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .campo__ayuda {
+    color: var(--color-on-surface-muted);
+  }
+  .campo__error {
+    color: var(--color-error);
+  }
+  .opciones__boleto {
+    margin-bottom: var(--spacing-md);
+  }
+  /* Toda la fila (control + texto) es la etiqueta: área clicable ≥ 44 px. */
+  .opcion {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-height: 44px;
+    padding-block: 10px;
+    cursor: pointer;
+  }
+  .opcion input {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin: 1px 0 0;
+    accent-color: var(--color-primary);
+  }
+  .opcion--acepto {
+    border-top: 1px solid var(--color-on-surface-muted);
+    padding-top: var(--spacing-md);
+  }
+  .trampa {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .form__envio {
+    margin-top: var(--spacing-lg);
+    display: grid;
+    gap: var(--spacing-md);
+    justify-items: start;
+  }
+  .aviso-corto {
+    background: var(--color-navy);
+    color: var(--color-on-navy);
+    font-weight: 600;
+    padding: 16px 24px;
+    max-width: none;
+    width: 100%;
+  }
+
+  .resultado {
+    display: grid;
+    gap: var(--spacing-lg);
+  }
+  .resultado[hidden] {
+    display: none;
+  }
+  .resultado:focus {
+    outline: none;
+  }
+  .resultado__pasos {
+    list-style: decimal;
+    padding-left: 1.25rem;
+    display: grid;
+    gap: var(--spacing-md);
+    max-width: var(--spacing-measure);
+  }
+  .muestra {
+    margin: 0;
+    display: grid;
+    gap: var(--spacing-sm);
+    justify-items: start;
+  }
+  .resumen {
+    margin: 0;
+  }
+  .resumen > div {
+    display: grid;
+    gap: 2px;
+    padding-block: 10px;
+    border-top: 1px solid var(--color-on-surface-muted);
+  }
+  .resumen > div:last-child {
+    border-bottom: 1px solid var(--color-on-surface-muted);
+  }
+  .resumen dt {
+    font-size: var(--text-label-md);
+    font-weight: 600;
+    color: var(--color-on-surface-muted);
+  }
+  .resumen dd {
+    margin: 0;
+  }
+  .enlace-boton {
+    background: none;
+    border: 0;
+    padding: 0;
+    min-height: 44px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+</style>

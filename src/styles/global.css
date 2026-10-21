@@ -1,0 +1,477 @@
+/* ============================================================
+   global.css — Meridiano de Torreón · marino (v2)
+   Contrato: agente/DESIGN.md (manda sobre este archivo).
+   ============================================================ */
+
+@import 'tailwindcss';
+@import '@fontsource-variable/hubot-sans/standard.css';
+@import '@fontsource-variable/atkinson-hyperlegible-next/index.css';
+
+/* 1. Sin la paleta ni las escalas por defecto de Tailwind. */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-*: initial;
+  --tracking-*: initial;
+  --leading-*: initial;
+  --font-weight-*: initial;
+  --ease-*: initial;
+  --animate-*: initial;
+  --blur-*: initial;
+}
+
+/* 2. Contrato v2 (agente/theme.css). */
+@theme {
+  --color-primary: #095ce4;
+  --color-primary-hover: #0b4fc4;
+  --color-on-primary: #f4f7fb;
+  --color-navy: #00112f;
+  --color-navy-panel: #00286a;
+  --color-on-navy: #f4f7fb;
+  --color-on-navy-muted: #a9bbd3;
+  --color-signal-cyan: #01f6fa;
+  --color-neutral: #f4f7fb;
+  --color-on-surface: #0b1b33;
+  --color-on-surface-muted: #4a5b70;
+  --color-error: #b3261e;
+
+  --font-display: 'Hubot Sans Variable', system-ui, sans-serif;
+  --font-body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+
+  /* Escala: 7 tamaños. Móvil (390 px) → escritorio (1280 px). */
+  --text-figure: clamp(4.5rem, calc(3.1854rem + 5.3933vw), 7.5rem); /* 72 → 120 */
+  --text-display: clamp(2.75rem, calc(1.5449rem + 4.9438vw), 5.5rem); /* 44 → 88 */
+  --text-headline-lg: clamp(2.125rem, calc(1.5225rem + 2.4719vw), 3.5rem); /* 34 → 56 */
+  --text-headline-md: clamp(1.375rem, calc(1.2107rem + 0.6742vw), 1.75rem); /* 22 → 28 */
+  --text-body-lg: clamp(1.125rem, calc(1.0702rem + 0.2247vw), 1.25rem); /* 18 → 20 */
+  --text-body-md: 1.0625rem; /* 17 */
+  --text-label-md: 0.9375rem; /* 15 */
+
+  --radius-none: 0px;
+  --radius-sm: 3px;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 64px;
+  --spacing-section: 128px;
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 16px;
+  --spacing-margin-desktop: 40px;
+  --spacing-container: 1280px;
+  /* 33rem = 528 px: ≤ 75 caracteres reales con Atkinson (rondas 1–2). */
+  --spacing-measure: 33rem;
+  --spacing-tick: 16px;
+  --spacing-rule: 1px;
+  --spacing-rule-strong: 2px;
+  --spacing-chamfer: 16px;
+  --spacing-seam-rise: 72px;
+  --spacing-seam-rise-mobile: 32px;
+}
+
+:root {
+  --curva: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --seccion: 64px;
+  --margen: var(--spacing-margin-mobile);
+  --subida: var(--spacing-seam-rise-mobile);
+  --cabecera: 72px;
+}
+@media (min-width: 1024px) {
+  :root {
+    --seccion: var(--spacing-section);
+    --margen: var(--spacing-margin-desktop);
+    --subida: var(--spacing-seam-rise);
+  }
+}
+
+/* ---------- Elementos (en @layer base: trampa de Tailwind v4) ---------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--cabecera);
+    background: var(--color-navy);
+  }
+  body {
+    margin: 0;
+    background: var(--color-navy);
+    color: var(--color-on-navy);
+    font-family: var(--font-body);
+    font-size: var(--text-body-md);
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    /* Páginas cortas: el pie queda pegado abajo. */
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  body > main {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+  body > main > .pagina {
+    flex: 1 0 auto;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    margin: 0;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+  h1 {
+    font-size: var(--text-display);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'wdth' 118;
+  }
+  h2 {
+    font-size: var(--text-headline-lg);
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'wdth' 116;
+  }
+  h3 {
+    font-size: var(--text-headline-md);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0;
+    font-variation-settings: 'wdth' 108;
+  }
+  p,
+  li,
+  dd,
+  dt,
+  td,
+  th {
+    overflow-wrap: break-word;
+  }
+  p {
+    margin: 0;
+    max-width: var(--spacing-measure);
+  }
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+  }
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+  /* Enlaces sobre marino: claro con subrayado cian. */
+  a {
+    color: var(--color-on-navy);
+    text-decoration: underline;
+    text-decoration-color: var(--color-signal-cyan);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-thickness 150ms var(--curva);
+  }
+  a:hover {
+    color: var(--color-on-navy);
+    text-decoration-thickness: 2px;
+  }
+  strong {
+    font-weight: 600;
+  }
+  :where(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid var(--color-signal-cyan);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}
+
+/* ---------- Secciones claras (/registro y avisos legales) ---------- */
+.claro {
+  background: var(--color-neutral);
+  color: var(--color-on-surface);
+}
+.claro a:not(.boton) {
+  color: var(--color-primary);
+  text-decoration-color: currentColor;
+}
+.claro a:not(.boton):hover {
+  color: var(--color-primary-hover);
+}
+.claro :where(a, button, input, select, textarea, summary):focus-visible {
+  outline-color: var(--color-primary);
+}
+
+/* ---------- Tipografía de apoyo ---------- */
+.entrada {
+  font-size: var(--text-body-lg);
+  line-height: 1.5;
+}
+.nota {
+  font-size: var(--text-label-md);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-on-navy-muted);
+}
+.claro .nota {
+  color: var(--color-on-surface-muted);
+}
+.rotulo {
+  font-size: var(--text-label-md);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-signal-cyan);
+}
+.fecha {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-md);
+  font-weight: 800;
+  line-height: 1.15;
+  font-variation-settings: 'wdth' 108;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-signal-cyan);
+}
+.cifra {
+  font-variant-numeric: tabular-nums;
+}
+.fuerte {
+  font-weight: 600;
+}
+.atenuado {
+  color: var(--color-on-navy-muted);
+}
+
+/* ---------- Marco y secciones ---------- */
+.marco {
+  max-width: var(--spacing-container);
+  margin-inline: auto;
+  padding-inline: var(--margen);
+}
+.seccion {
+  position: relative;
+  padding-block: calc(var(--seccion) / 2);
+}
+.seccion--panel {
+  background: var(--color-navy-panel);
+}
+/* Unión en faceta: el borde superior sube de izquierda a derecha («/»). */
+.union {
+  z-index: 1;
+  margin-top: calc(-1 * var(--subida));
+  padding-top: calc(var(--seccion) / 2 + var(--subida));
+  clip-path: polygon(0 var(--subida), 100% 0, 100% 100%, 0 100%);
+}
+.reticula {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-lg);
+}
+@media (min-width: 1024px) {
+  .reticula {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--spacing-gutter);
+  }
+}
+.cabeza-seccion {
+  max-width: 52rem;
+  margin-bottom: var(--spacing-xl);
+}
+.cabeza-seccion > * + * {
+  margin-top: var(--spacing-lg);
+}
+@media (min-width: 1024px) {
+  .cabeza-seccion {
+    margin-bottom: var(--spacing-2xl);
+  }
+}
+.pila > * + * {
+  margin-top: var(--spacing-md);
+}
+.pila-lg > * + * {
+  margin-top: var(--spacing-lg);
+}
+.pila-xl > * + * {
+  margin-top: var(--spacing-xl);
+}
+
+/* ---------- Chaflán (esquina sup. derecha e inf. izquierda, 45°) ---------- */
+.chaflan {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--spacing-chamfer)) 0,
+    100% var(--spacing-chamfer),
+    100% 100%,
+    var(--spacing-chamfer) 100%,
+    0 calc(100% - var(--spacing-chamfer))
+  );
+}
+
+/* ---------- Panel en faceta ---------- */
+.panel {
+  background: var(--color-navy-panel);
+  color: var(--color-on-navy);
+  padding: 32px;
+}
+.seccion--panel .panel {
+  background: var(--color-navy);
+}
+
+/* ---------- Botón ---------- */
+.boton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 14px 28px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 200ms var(--curva),
+    transform 120ms var(--curva);
+}
+.boton::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: var(--spacing-rule-strong);
+  background: var(--color-signal-cyan);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms var(--curva);
+}
+.claro .boton::after {
+  background: var(--color-primary);
+}
+.boton:hover {
+  background: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
+.boton:hover::after {
+  transform: scaleX(1);
+}
+.boton:active {
+  transform: translateY(1px);
+}
+.boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Enlace que va solo en su renglón: área de toque 44 × 44 px. */
+.enlace-suelto {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* ---------- Pendiente visible ---------- */
+.pendiente {
+  font-weight: 600;
+  color: var(--color-on-navy);
+  border-bottom: 1px dotted var(--color-on-navy-muted);
+}
+.claro .pendiente {
+  color: var(--color-on-surface);
+  border-bottom-color: var(--color-on-surface-muted);
+}
+
+/* ---------- Listas con filete ---------- */
+.indice {
+  list-style: none;
+}
+.indice > li {
+  padding-block: 12px;
+  border-top: 1px solid var(--color-navy-panel);
+}
+.indice > li:last-child {
+  border-bottom: 1px solid var(--color-navy-panel);
+}
+
+/* ---------- Fotos ---------- */
+.foto {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-navy-panel);
+}
+.foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pie-foto {
+  font-size: var(--text-label-md);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-on-navy-muted);
+  max-width: none;
+}
+
+/* ---------- Revelado en faceta (único patrón al hacer scroll) ----------
+   El estado oculto solo existe con JS (html.js) y sin movimiento reducido:
+   sin JS, o si el observador falla, todo se ve. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-revelar] {
+    clip-path: polygon(0 0, 0 0, -30% 100%, -30% 100%);
+    transition: clip-path 600ms var(--curva);
+  }
+  html.js [data-revelar].revelado {
+    clip-path: polygon(0 0, 130% 0, 100% 100%, -30% 100%);
+  }
+}
+
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Requisito: respetar «reducir movimiento». */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
