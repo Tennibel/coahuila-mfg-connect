@@ -44,8 +44,8 @@
 
   /* Escala: 7 tamaños. Móvil (390 px) → escritorio (1280 px). */
   --text-figure: clamp(4.5rem, calc(3.1854rem + 5.3933vw), 7.5rem); /* 72 → 120 */
-  --text-display: clamp(2.75rem, calc(1.5449rem + 4.9438vw), 5.5rem); /* 44 → 88 */
-  --text-headline-lg: clamp(2.125rem, calc(1.5225rem + 2.4719vw), 3.5rem); /* 34 → 56 */
+  --text-display: clamp(2.25rem, calc(1.5112rem + 3.0337vw), 4rem); /* 36 → 64 (v2.2) */
+  --text-headline-lg: clamp(1.875rem, calc(1.382rem + 2.0225vw), 3rem); /* 30 → 48 (v2.2) */
   --text-headline-md: clamp(1.375rem, calc(1.2107rem + 0.6742vw), 1.75rem); /* 22 → 28 */
   --text-body-lg: clamp(1.125rem, calc(1.0702rem + 0.2247vw), 1.25rem); /* 18 → 20 */
   --text-body-md: 1.0625rem; /* 17 */
@@ -77,6 +77,8 @@
 
 :root {
   --curva: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --entrada-duracion: 720ms;
+  --entrada-desfase: 70ms;
   --seccion: 64px;
   --margen: var(--spacing-margin-mobile);
   --subida: var(--spacing-seam-rise-mobile);
@@ -356,7 +358,7 @@
   cursor: pointer;
   transition:
     background-color 200ms var(--curva),
-    transform 120ms var(--curva);
+    transform 200ms var(--curva);
 }
 .boton::after {
   content: '';
@@ -376,6 +378,7 @@
 .boton:hover {
   background: var(--color-primary-hover);
   color: var(--color-on-primary);
+  transform: translate3d(0, -2px, 0);
 }
 .boton:hover::after {
   transform: scaleX(1);
@@ -386,6 +389,106 @@
 .boton:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* ---------- CTA con brillo (v2.2, pedido de Cori) ----------
+   Borde con un conic-gradient que gira lento (5 s por vuelta, ángulo con
+   @property), resplandor cian suave y, en hover, el resplandor sube (opacidad)
+   y pasa un barrido de luz diagonal (600 ms, transform). El texto conserva su
+   contraste (on-primary sobre primary: 5.34:1). */
+@property --angulo {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.boton--brillo {
+  isolation: isolate;
+}
+.boton--brillo::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: 5px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--angulo),
+    rgb(1 246 250 / 0.15) 0deg,
+    rgb(1 246 250 / 0.15) 200deg,
+    var(--color-signal-cyan) 260deg,
+    var(--color-primary) 300deg,
+    rgb(1 246 250 / 0.15) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  box-shadow: 0 0 18px -2px rgb(1 246 250 / 0.28);
+}
+/* Halo: en reposo tenue, en hover más intenso (solo cambia la opacidad). */
+.boton--brillo::after {
+  left: -6px;
+  right: -6px;
+  top: -6px;
+  bottom: -6px;
+  height: auto;
+  z-index: -2;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: 0 0 28px 2px rgb(1 246 250 / 0.45);
+  transform: none;
+  opacity: 0.25;
+  transition: opacity 300ms var(--curva);
+}
+.boton--brillo:hover::after,
+.boton--brillo:focus-visible::after {
+  transform: none;
+  opacity: 1;
+}
+.boton__barrido {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.boton__barrido::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(105deg, rgb(244 247 251 / 0) 0%, rgb(244 247 251 / 0.38) 50%, rgb(244 247 251 / 0) 100%);
+  transform: translate3d(-120%, 0, 0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .boton--brillo::before {
+    animation: boton-girar 5s linear infinite;
+  }
+  .boton__barrido::before {
+    transition: transform 600ms var(--curva);
+  }
+  .boton--brillo:hover .boton__barrido::before {
+    transform: translate3d(330%, 0, 0);
+  }
+}
+@keyframes boton-girar {
+  to {
+    --angulo: 360deg;
+  }
+}
+/* Variante de contorno (segundo llamado, no es un segundo botón lleno). */
+.boton--contorno {
+  background: rgb(0 17 47 / 0.6);
+  color: var(--color-on-navy);
+}
+.boton--contorno:hover {
+  background: var(--color-navy-panel);
+  color: var(--color-on-navy);
 }
 
 /* Enlace que va solo en su renglón: área de toque 44 × 44 px. */
@@ -429,6 +532,33 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 800ms var(--curva);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .foto:hover img {
+    transform: scale(1.04);
+  }
+}
+/* Parallax: la imagen es 20 % más alta que su marco y se desplaza dentro
+   (±8 %) con translate3d; el marco recorta, así nunca se ve un borde. */
+[data-parallax] > picture {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10%;
+  bottom: -10%;
+  display: block;
+}
+[data-parallax] > picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-parallax] > picture,
+  html.js [data-parallax-hero] {
+    will-change: transform;
+  }
 }
 .pie-foto {
   font-size: var(--text-label-md);
@@ -438,7 +568,34 @@
   max-width: none;
 }
 
-/* ---------- Revelado en faceta (único patrón al hacer scroll) ----------
+/* ---------- Entradas escalonadas de texto (v2.2) ----------
+   Cada hijo directo de [data-escalonar] sube 20 px con opacidad, 720 ms,
+   desfase de 70 ms (--n lo pone el JS). Solo con JS y sin movimiento reducido. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-escalonar] > * {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+    transition:
+      opacity var(--entrada-duracion) var(--curva),
+      transform var(--entrada-duracion) var(--curva);
+    transition-delay: calc(var(--n, 0) * var(--entrada-desfase));
+  }
+  html.js [data-escalonar].revelado > * {
+    opacity: 1;
+    transform: none;
+  }
+  /* Transiciones entre páginas (View Transitions, mismo origen). */
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+/* ---------- Revelado en faceta (fotos) ----------
    El estado oculto solo existe con JS (html.js) y sin movimiento reducido:
    sin JS, o si el observador falla, todo se ve. */
 @media (prefers-reduced-motion: no-preference) {

@@ -111,7 +111,7 @@ const hitos = [
 
   <!-- ================= Portada ================= -->
   <section class="hero" aria-labelledby="hero-titulo">
-    <div class="hero__medio">
+    <div class="hero__medio" data-parallax-hero="0.18">
       <Picture
         src={imgHero}
         formats={['avif']}
@@ -145,15 +145,16 @@ const hitos = [
 
     <div class="marco hero__marco">
       <div class="hero__contenido">
-        <span class="hero__meridiano" aria-hidden="true"></span>
+        <span class="hero__meridiano" aria-hidden="true"><span class="destello destello--torreon"></span></span>
         <h1 id="hero-titulo" class="hero__h1">La manufactura de México, Estados Unidos y Canadá se conecta en Torreón</h1>
         <div class="hero__fila">
-        <div class="hero__datos entra">
+        <div class="hero__datos entra" style="--k:1">
           <p class="fecha">9 y 10 de junio de 2027</p>
           <p class="entrada">{settings.sede.nombre}</p>
         </div>
         <div
           class="cuenta entra"
+          style="--k:2"
           role="timer"
           aria-live="off"
           aria-label={`Faltan ${diasFaltan} días para el 9 de junio de 2027`}
@@ -166,9 +167,9 @@ const hitos = [
           <span class="cuenta__unidad nota" aria-hidden="true">días</span>
         </div>
         </div>
-        <div class="hero__acciones entra">
-          <a class="boton" href={ruta('registro/')} data-cta="registrarme" data-cta-location="hero">Registrarme</a>
-          <a class="enlace-suelto" href="#expositores" data-cta="exponer_patrocinar" data-cta-location="hero">Exponer o patrocinar</a>
+        <div class="hero__acciones entra" style="--k:3">
+          <a class="boton boton--brillo" href={ruta('registro/')} data-cta="registrarme" data-cta-location="hero">Registrarme<span class="boton__barrido" aria-hidden="true"></span></a>
+          <a class="boton boton--contorno boton--brillo" href="#expositores" data-cta="exponer_patrocinar" data-cta-location="hero">Exponer o patrocinar<span class="boton__barrido" aria-hidden="true"></span></a>
         </div>
       </div>
 
@@ -241,7 +242,7 @@ const hitos = [
   <section id="que-es" class="seccion que-es" aria-labelledby="que-es-titulo">
     <div class="marco">
       <div class="que-es__texto">
-        <div class="cabeza-seccion" data-revelar>
+        <div class="cabeza-seccion" data-escalonar>
           <h2 id="que-es-titulo">Compradores y proveedores de tres países, dos días en Torreón</h2>
           <p class="entrada">
             Coahuila Automotive & Manufacturing Connect reúne a empresas compradoras, proveedores de tecnología y
@@ -271,7 +272,7 @@ const hitos = [
         </dl>
       </div>
     </div>
-    <figure class="foto que-es__foto" data-revelar>
+    <figure class="foto que-es__foto" data-revelar data-parallax="0.15">
       <Picture
         src={imgPiezas}
         formats={['avif']}
@@ -290,7 +291,7 @@ const hitos = [
   <!-- ================= Agenda (línea de tiempo) ================= -->
   <section id="agenda" class="seccion agenda" aria-labelledby="agenda-titulo" data-observar>
     <div class="marco">
-      <div class="cabeza-seccion">
+      <div class="cabeza-seccion" data-escalonar>
         <h2 id="agenda-titulo">Agenda: tres días en junio de 2027</h2>
         <p class="entrada">Un día de visitas industriales y dos días de evento en el Centro de Convenciones Torreón.</p>
       </div>
@@ -318,7 +319,7 @@ const hitos = [
 
   <!-- ================= Banda «Registrarme» ================= -->
   <section class="banda banda--foto union" aria-labelledby="banda-registro-titulo">
-    <div class="banda__foto" data-revelar>
+    <div class="banda__foto" data-revelar data-parallax="0.18">
       <Picture
         src={imgRed}
         formats={['avif']}
@@ -332,11 +333,13 @@ const hitos = [
       />
     </div>
     <div class="banda__velo"></div>
-    <div class="marco banda__contenido">
+    <span class="destello destello--banda destello--b1" aria-hidden="true"></span>
+    <span class="destello destello--banda destello--b2 destello--tarde" aria-hidden="true"></span>
+    <div class="marco banda__contenido" data-escalonar>
       <h2 id="banda-registro-titulo">9 y 10 de junio, Torreón</h2>
       <p class="entrada">Registro de visitante con pago en línea y QR por correo.</p>
       <p>
-        <a class="boton" href={ruta('registro/')} data-cta="registrarme" data-cta-location="banda">Registrarme</a>
+        <a class="boton boton--brillo" href={ruta('registro/')} data-cta="registrarme" data-cta-location="banda">Registrarme<span class="boton__barrido" aria-hidden="true"></span></a>
       </p>
     </div>
   </section>
@@ -366,21 +369,21 @@ const hitos = [
       </figure>
       <ul class="cifras" data-revelar>
         <li>
-          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> 80</span>
+          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> <span data-contar="80">80</span><span class="destello destello--cifra" aria-hidden="true"></span></span>
           <span class="cifras__etiqueta">empresas proveedoras · meta</span>
         </li>
         <li>
-          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> 60</span>
+          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> <span data-contar="60">60</span></span>
           <span class="cifras__etiqueta">compradores calificados · meta</span>
         </li>
         <li>
-          <span class="cifras__numero cifra">15<span class="cifras__unidad">min</span></span>
+          <span class="cifras__numero cifra"><span data-contar="15">15</span><span class="cifras__unidad">min</span></span>
           <span class="cifras__etiqueta">por cita, en 15 mesas de negocios</span>
         </li>
       </ul>
-      <div class="cifras-ancha">
+      <div class="cifras-ancha" data-observar>
         <p class="rotulo">Meta</p>
-        <p class="cifras__numero cifra">380 a 400</p>
+        <p class="cifras__numero cifra"><span data-contar="380">380</span> a <span data-contar="400">400</span><span class="destello destello--cifra destello--tarde" aria-hidden="true"></span></p>
         <p class="cifras__etiqueta">citas B2B en dos días. La agenda depende de la disponibilidad y de que los perfiles coincidan.</p>
       </div>
       <div class="panel chaflan b2b__panel pila">
@@ -418,7 +421,7 @@ const hitos = [
           data-ia="higgsfield"
         />
       </figure>
-      <div class="foro__texto pila">
+      <div class="foro__texto pila" data-escalonar>
         <h3>Foro de Industria y Mercado</h3>
         <p>
           Para escuchar a quienes deciden en la manufactura y revisar lo que está cambiando en la proveeduría entre
@@ -468,7 +471,7 @@ const hitos = [
   <!-- ================= Visitas industriales ================= -->
   <section id="visitas" class="seccion visitas" aria-labelledby="visitas-titulo">
     <div class="marco">
-      <div class="cabeza-seccion" data-revelar>
+      <div class="cabeza-seccion" data-escalonar>
         <h2 id="visitas-titulo">Visitas industriales el 8 de junio de 2027</h2>
         <p class="entrada">
           Propuestas, sujetas a autorización y disponibilidad de las plantas. Beneficio para expositores, con cupo
@@ -477,7 +480,7 @@ const hitos = [
       </div>
     </div>
     <div class="visitas__par" data-revelar>
-      <figure class="foto visitas__foto visitas__foto--a">
+      <figure class="foto visitas__foto visitas__foto--a" data-parallax="0.12">
         <Picture
           src={imgEnsamble}
           formats={['avif']}
@@ -494,7 +497,7 @@ const hitos = [
           <span>El ensamble automotriz y su cadena de proveeduría.</span>
         </figcaption>
       </figure>
-      <figure class="foto visitas__foto visitas__foto--b">
+      <figure class="foto visitas__foto visitas__foto--b" data-parallax="0.12">
         <Picture
           src={imgArneses}
           formats={['avif']}
@@ -525,7 +528,7 @@ const hitos = [
   <!-- ================= Boletos y registro ================= -->
   <section id="boletos" class="seccion seccion--panel union" aria-labelledby="boletos-titulo">
     <div class="marco">
-      <div class="cabeza-seccion">
+      <div class="cabeza-seccion" data-escalonar>
         <h2 id="boletos-titulo">Boleto de visitante y registro en tres pasos</h2>
       </div>
       <div class="boletos">
@@ -537,10 +540,10 @@ const hitos = [
             <div><dt class="fuerte">Registro</dt><dd>Apertura y cierre: <Pendiente texto="fechas" /></dd></div>
           </dl>
           <p>
-            <a class="boton" href={ruta('registro/')} data-cta="ir_registro" data-cta-location="boletos">Ir al registro</a>
+            <a class="boton boton--brillo" href={ruta('registro/')} data-cta="ir_registro" data-cta-location="boletos">Ir al registro<span class="boton__barrido" aria-hidden="true"></span></a>
           </p>
         </div>
-        <ol class="pasos">
+        <ol class="pasos" data-escalonar>
           <li>
             <span class="pasos__numero cifra">1</span>
             <h3>Elija su boleto y pague</h3>
@@ -566,7 +569,7 @@ const hitos = [
 
   <!-- ================= Organizan y aliados ================= -->
   <Seccion id="organizadores" titulo="Lo organizan ANAPSA y ADN de la Manufactura">
-    <div class="organizan">
+    <div class="organizan" data-escalonar>
       <div class="pila">
         <h3>ANAPSA</h3>
         <p class="nota">Agencia Nacional del Sector Automotriz</p>
@@ -596,10 +599,10 @@ const hitos = [
   <!-- ================= Banda «Exponer o patrocinar» ================= -->
   <section id="expositores" class="seccion seccion--panel union banda-exponer" aria-labelledby="expositores-titulo">
     <div class="marco reticula">
-      <div class="banda-exponer__cabeza">
+      <div class="banda-exponer__cabeza" data-escalonar>
         <h2 id="expositores-titulo">Exponer o patrocinar en Torreón</h2>
       </div>
-      <div class="banda-exponer__texto pila-lg">
+      <div class="banda-exponer__texto pila-lg" data-escalonar>
         <p class="entrada">
           Como expositor tiene acceso a la agenda de citas B2B con compradores y a las visitas industriales propuestas
           para el 8 de junio, con cupo limitado y sujetas a la autorización de las plantas.
@@ -612,7 +615,7 @@ const hitos = [
         <ul class="contacto">
           <li>
             <Icono nombre="envelope" tamano={22} />
-            <a class="enlace-suelto" href={`mailto:${correo}?subject=${encodeURIComponent('Exponer o patrocinar en Coahuila MFG Connect')}`} data-cta="pedir_informacion" data-cta-location="expositores">Pedir información</a>
+            <a class="boton boton--contorno boton--brillo" href={`mailto:${correo}?subject=${encodeURIComponent('Exponer o patrocinar en Coahuila MFG Connect')}`} data-cta="pedir_informacion" data-cta-location="expositores">Pedir información<span class="boton__barrido" aria-hidden="true"></span></a>
             <span class="nota">{correo}</span>
           </li>
           <li><span class="nota">Teléfono o WhatsApp: <Pendiente texto="número de contacto" /></span></li>
@@ -653,10 +656,100 @@ const hitos = [
 </Layout>
 
 <script>
+  const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Parallax (v2.2): solo transform, un rAF por cuadro ----------
+  // Portada: el video/póster baja a 0.18 de la velocidad del scroll (se ve más
+  // lento que el texto). Fotos: la <picture> (20 % más alta que su marco) se
+  // desplaza ±8 % según la posición del marco en la ventana.
+  if (!sinMovimiento) {
+    const heroMedio = document.querySelector<HTMLElement>('[data-parallax-hero]');
+    const fotos = Array.from(document.querySelectorAll<HTMLElement>('[data-parallax]'))
+      .map((el) => ({ el, img: el.querySelector<HTMLElement>(':scope > picture'), f: Number(el.dataset.parallax) || 0.15, visible: false }))
+      .filter((x) => x.img);
+    const io = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        const x = fotos.find((f) => f.el === e.target);
+        if (x) x.visible = e.isIntersecting;
+      });
+      pedir();
+    }, { rootMargin: '10% 0px' });
+    fotos.forEach((x) => io.observe(x.el));
+    let pendiente = false;
+    const pintar = () => {
+      pendiente = false;
+      const alto = window.innerHeight;
+      const y = window.scrollY;
+      if (heroMedio && y < alto * 1.5) {
+        heroMedio.style.transform = `translate3d(0, ${(y * Number(heroMedio.dataset.parallaxHero || 0.18)).toFixed(1)}px, 0)`;
+      }
+      for (const x of fotos) {
+        if (!x.visible || !x.img) continue;
+        const r = x.el.getBoundingClientRect();
+        // -1 (el marco entra por abajo) … 1 (sale por arriba)
+        const p = Math.max(-1, Math.min(1, (alto / 2 - (r.top + r.height / 2)) / (alto / 2 + r.height / 2)));
+        // Desplazamiento máximo: 8 % del alto del marco × (f / 0.15), tope 9 %.
+        const max = Math.min(0.09, 0.08 * (x.f / 0.15)) * r.height;
+        x.img.style.transform = `translate3d(0, ${(p * max).toFixed(1)}px, 0)`;
+      }
+    };
+    const pedir = () => {
+      if (!pendiente) {
+        pendiente = true;
+        requestAnimationFrame(pintar);
+      }
+    };
+    window.addEventListener('scroll', pedir, { passive: true });
+    window.addEventListener('resize', pedir);
+    pedir();
+  }
+
+  // ---------- Cifras que cuentan al entrar (una vez, 900 ms, ease-out) ----------
+  // El valor final ya está en el HTML; sin JS o con movimiento reducido se ve fijo.
+  if (!sinMovimiento && 'IntersectionObserver' in window) {
+    const numeros = document.querySelectorAll<HTMLElement>('[data-contar]');
+    const contar = (el: HTMLElement) => {
+      const meta = Number(el.dataset.contar);
+      const t0 = performance.now();
+      const paso = (t: number) => {
+        const k = Math.min(1, (t - t0) / 900);
+        el.textContent = String(Math.round(meta * (1 - Math.pow(1 - k, 3))));
+        if (k < 1) requestAnimationFrame(paso);
+      };
+      requestAnimationFrame(paso);
+    };
+    const ioC = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll<HTMLElement>('[data-contar]').forEach(contar);
+          ioC.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -20% 0px' });
+    const grupos = new Set<HTMLElement>();
+    numeros.forEach((n) => grupos.add((n.closest('li, .cifras-ancha') as HTMLElement) ?? n));
+    grupos.forEach((g) => {
+      // Si todavía no está en pantalla, arranca en 0 para que no se vea el salto.
+      if (g.getBoundingClientRect().top > window.innerHeight) {
+        // Reserva el alto final (p. ej. «380 a 400» ocupa 2 líneas en móvil):
+        // así contar desde 0 no mueve nada (CLS 0).
+        g.querySelectorAll<HTMLElement>('.cifras__numero').forEach((c) => (c.style.minHeight = `${c.offsetHeight}px`));
+        g.querySelectorAll<HTMLElement>('[data-contar]').forEach((n) => {
+          // Ancho final reservado: los dígitos que crecen no empujan el resto.
+          n.style.display = 'inline-block';
+          n.style.minWidth = `${n.getBoundingClientRect().width}px`;
+          n.style.textAlign = 'right';
+          n.textContent = '0';
+        });
+      }
+      ioC.observe(g);
+    });
+  }
+
   // ---------- Video de portada ----------
   const video = document.querySelector<HTMLVideoElement>('[data-video]');
   const pausa = document.querySelector<HTMLButtonElement>('[data-pausa]');
-  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reducido = sinMovimiento;
   const ahorro = (navigator as any).connection?.saveData === true;
   if (video && pausa && !reducido && !ahorro) {
     const ancho = window.innerWidth <= 900 ? '1280' : '1920';
@@ -921,7 +1014,15 @@ const hitos = [
     transform-origin: top;
   }
   .hero__h1 {
-    max-width: 16ch;
+    max-width: none;
+  }
+  /* Móvil: ancho de letra 100 y 32–36 px para quedar en ≤ 5 líneas a 390 px
+     (y no pasar de 6 en 320 px). */
+  @media (max-width: 767px) {
+    .hero__h1 {
+      font-size: clamp(2rem, 9.2vw, 2.25rem);
+      font-variation-settings: 'wdth' 100;
+    }
   }
   .hero__datos {
     margin-top: var(--spacing-lg);
@@ -1009,6 +1110,22 @@ const hitos = [
     .barra__celda {
       padding: 16px;
     }
+    .barra dt {
+      overflow-wrap: normal;
+      hyphens: none;
+    }
+  }
+  /* En 320–359 px «Visitas industriales» no cabe en media celda: una columna. */
+  @media (max-width: 359px) {
+    .barra {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .barra__celda:nth-child(2n) {
+      border-left: 0;
+    }
+    .barra__celda + .barra__celda {
+      border-top: 1px solid var(--color-navy);
+    }
   }
   @media (min-width: 1024px) {
     .hero__marco {
@@ -1028,10 +1145,9 @@ const hitos = [
       height: 1px;
       background: var(--color-signal-cyan);
     }
-    /* Hasta 10 columnas: con 8 el h1 de 88 px se iba a 7 líneas y el botón
-       quedaba bajo el pliegue a 1440 × 900. */
+    /* v2.2: h1 de 64 px en 3 líneas a 1440 px (pedido de Cori: título más chico). */
     .hero__h1 {
-      max-width: calc((min(100vw, var(--spacing-container)) - 2 * var(--margen) - 11 * var(--spacing-gutter)) / 12 * 10 + 9 * var(--spacing-gutter));
+      max-width: 24ch;
     }
     .hero__fila {
       display: flex;
@@ -1058,14 +1174,17 @@ const hitos = [
     :global(html.js) .hero__meridiano {
       animation: entra-linea 700ms var(--curva) var(--retraso-linea, 0ms) both;
     }
+    /* Cascada de la portada (v2.2): titular → fecha → cuenta → acciones →
+       barra, 720 ms cada uno y 80 ms entre sí; con preloader arranca cuando el
+       telón se abre (--retraso). */
     :global(html.js) .hero__h1 {
-      animation: entra-sube 500ms var(--curva) var(--retraso, 0ms) both;
+      animation: entra-sube 760ms var(--curva) var(--retraso, 0ms) both;
     }
     :global(html.js) .entra {
-      animation: entra-opacidad 200ms var(--curva) calc(var(--retraso, 0ms) + 500ms) both;
+      animation: entra-sube 720ms var(--curva) calc(var(--retraso, 0ms) + 160ms + var(--k, 1) * 80ms) both;
     }
     :global(html.js) .hero__pie {
-      animation: entra-sube-16 300ms var(--curva) calc(var(--retraso, 0ms) + 700ms) both;
+      animation: entra-sube 720ms var(--curva) calc(var(--retraso, 0ms) + 520ms) both;
     }
     /* Con preloader, la línea del preloader es la que se dibuja: la de la
        portada queda estática debajo (sin depender del JS). */
@@ -1084,7 +1203,7 @@ const hitos = [
   @keyframes entra-sube {
     from {
       opacity: 0;
-      transform: translateY(12px);
+      transform: translate3d(0, 20px, 0);
     }
   }
   @keyframes entra-sube-16 {
@@ -1096,6 +1215,89 @@ const hitos = [
   @keyframes entra-opacidad {
     from {
       opacity: 0;
+    }
+  }
+
+  /* ================= Destellos (v2.2, pedido de Cori) =================
+     Pocos y puntuales (máx. 3 por pantalla): punto de Torreón en la portada,
+     dos cifras B2B y dos chispas en la banda de la red. Solo CSS
+     (radial-gradient); se animan opacidad y transform. Con movimiento
+     reducido quedan fijos a media intensidad. */
+  .destello {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    pointer-events: none;
+    background: radial-gradient(circle, rgb(244 247 251 / 0.95) 0 6%, rgb(1 246 250 / 0.55) 16%, rgb(1 246 250 / 0) 62%);
+    opacity: 0.55;
+  }
+  .destello::before,
+  .destello::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 220%;
+    height: 1px;
+    background: linear-gradient(to right, rgb(1 246 250 / 0), rgb(244 247 251 / 0.8), rgb(1 246 250 / 0));
+    transform: translate(-50%, -50%);
+  }
+  .destello::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+    width: 160%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .destello {
+      animation: destellar 5.5s var(--curva) infinite;
+    }
+    .destello--tarde {
+      animation-delay: 2.4s;
+    }
+  }
+  @keyframes destellar {
+    0%,
+    62%,
+    100% {
+      opacity: 0.35;
+      transform: scale(0.8) rotate(0deg);
+    }
+    74% {
+      opacity: 1;
+      transform: scale(1.15) rotate(45deg);
+    }
+    86% {
+      opacity: 0.5;
+      transform: scale(0.9) rotate(90deg);
+    }
+  }
+  .destello--torreon {
+    left: -18px;
+    top: -18px;
+  }
+  .destello--cifra {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: 28px;
+    height: 28px;
+    margin-left: 4px;
+  }
+  .destello--banda {
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+  }
+  .destello--b1 {
+    right: 26%;
+    top: 34%;
+  }
+  .destello--b2 {
+    right: 12%;
+    top: 58%;
+  }
+  @media (max-width: 767px) {
+    .destello--b2 {
+      display: none;
     }
   }
 
@@ -1304,11 +1506,13 @@ const hitos = [
     align-items: center;
     overflow: hidden;
   }
-  .banda__foto,
-  .banda__foto :global(picture),
-  .banda__foto :global(img) {
+  .banda__foto {
     position: absolute;
     inset: 0;
+    overflow: hidden;
+  }
+  /* La <picture> la coloca la regla global de [data-parallax] (20 % más alta). */
+  .banda__foto :global(img) {
     width: 100%;
     height: 100%;
   }

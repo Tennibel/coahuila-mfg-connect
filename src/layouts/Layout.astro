@@ -122,7 +122,11 @@ const esquemas = [...(esInicio ? [evento] : []), ...schemaExtra];
       // Ojo: con clip-path el intersectionRatio queda en 0, así que se usa
       // isIntersecting con threshold 0 y un margen inferior del 25 % de la
       // ventana (equivale a entrar un cuarto en pantalla).
-      const elementos = document.querySelectorAll<HTMLElement>('[data-revelar], [data-observar]');
+      // Entradas escalonadas: cada hijo directo recibe su índice (--n).
+      document.querySelectorAll<HTMLElement>('[data-escalonar]').forEach((grupo) => {
+        Array.from(grupo.children).forEach((hijo, i) => (hijo as HTMLElement).style.setProperty('--n', String(i)));
+      });
+      const elementos = document.querySelectorAll<HTMLElement>('[data-revelar], [data-observar], [data-escalonar]');
       if (elementos.length) {
         if (!('IntersectionObserver' in window)) {
           elementos.forEach((el) => el.classList.add('revelado'));

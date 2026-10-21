@@ -144,15 +144,37 @@ const enlaces = [
     min-height: 44px;
     min-width: 44px;
   }
-  .cabecera__nav a:hover,
   .cabecera__menu nav a:hover {
     text-decoration: underline;
     text-decoration-color: var(--color-signal-cyan);
     text-decoration-thickness: 2px;
   }
-  .cabecera__nav .cabecera__registro {
-    text-decoration: underline;
-    text-decoration-color: var(--color-signal-cyan);
+  /* Subrayado animado (v2.2): filete cian que crece de izquierda a derecha. */
+  .cabecera__nav a {
+    position: relative;
+  }
+  .cabecera__nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    height: 2px;
+    background: var(--color-signal-cyan);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 250ms var(--curva);
+  }
+  .cabecera__nav a:hover::after,
+  .cabecera__nav a:focus-visible::after {
+    transform: scaleX(1);
+  }
+  .cabecera__nav .cabecera__registro::after {
+    transform: scaleX(1);
+    height: 1px;
+  }
+  .cabecera__nav .cabecera__registro:hover::after {
+    height: 2px;
   }
   .cabecera__menu summary {
     list-style: none;
