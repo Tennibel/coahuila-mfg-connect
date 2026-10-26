@@ -148,6 +148,7 @@ const cuentaGratis = [
         data-mp4-1920={ruta('media/hero-1920.mp4')}
         data-webm-1280={ruta('media/hero-1280.webm')}
         data-mp4-1280={ruta('media/hero-1280.mp4')}
+        data-mp4-720={ruta('media/hero-720.mp4')}
       ></video>
       <div class="hero__velo"></div>
     </div>
@@ -351,6 +352,7 @@ const cuentaGratis = [
       data-mp4-1920={ruta('media/banda-autos-1920.mp4')}
       data-webm-1280={ruta('media/banda-autos-1280.webm')}
       data-mp4-1280={ruta('media/banda-autos-1280.mp4')}
+      data-mp4-720={ruta('media/banda-autos-720.mp4')}
     ></video>
     <div class="banda__velo"></div>
     <button class="hero__pausa banda__pausa" type="button" hidden data-pausa-banda>
@@ -572,9 +574,9 @@ const cuentaGratis = [
               <p class="etapa__fechas">{etapas.conCosto.fechas}</p>
             </li>
           </ol>
-          <div class="contador" data-etapa-cuenta hidden={!enGratis}>
+          <div class="contador" data-etapa-cuenta hidden={!enGratis} role="timer" aria-label="Tiempo para que termine el registro gratis">
             <p class="contador__rotulo">El registro gratis termina en</p>
-            <ol class="contador__cifras" role="timer" aria-label="Tiempo para que termine el registro gratis">
+            <ol class="contador__cifras">
               {cuentaGratis.map((c) => (
                 <li>
                   <span class="contador__numero cifra" data-cuenta-u={c.u}>{String(c.n).padStart(2, '0')}</span>
@@ -846,21 +848,27 @@ const cuentaGratis = [
   }
 
   // ---------- Video de portada ----------
+  // Fuentes del video según el ancho. En teléfonos, solo MP4 (H.264) de 720 px:
+  // el teléfono lo decodifica con su chip de video y no traba la página.
+  const ponerFuentes = (v: HTMLVideoElement) => {
+    const telefono = window.innerWidth <= 600;
+    const ancho = telefono ? '720' : window.innerWidth <= 900 ? '1280' : '1920';
+    for (const f of telefono ? ['mp4'] : ['webm', 'mp4']) {
+      const src = v.getAttribute(`data-${f}-${ancho}`);
+      if (!src) continue;
+      const s = document.createElement('source');
+      s.type = `video/${f}`;
+      s.src = src;
+      v.appendChild(s);
+    }
+  };
+
   const video = document.querySelector<HTMLVideoElement>('[data-video]');
   const pausa = document.querySelector<HTMLButtonElement>('[data-pausa]');
   const reducido = sinMovimiento;
   const ahorro = (navigator as any).connection?.saveData === true;
   if (video && pausa && !reducido && !ahorro) {
-    const ancho = window.innerWidth <= 900 ? '1280' : '1920';
-    for (const [tipo, formato] of [
-      ['video/webm', 'webm'],
-      ['video/mp4', 'mp4'],
-    ]) {
-      const s = document.createElement('source');
-      s.type = tipo;
-      s.src = video.getAttribute(`data-${formato}-${ancho}`) ?? '';
-      video.appendChild(s);
-    }
+    let listo = false;
     let pausadoPorUsuario = false;
     let enPantalla = true;
     const texto = pausa.querySelector<HTMLElement>('[data-pausa-texto]');
@@ -873,7 +881,7 @@ const cuentaGratis = [
       if (iconoPlay) iconoPlay.hidden = corriendo;
     };
     const intentar = () => {
-      if (pausadoPorUsuario || !enPantalla || document.hidden) return;
+      if (!listo || pausadoPorUsuario || !enPantalla || document.hidden) return;
       video.play().catch(() => {});
     };
     video.addEventListener('playing', () => {
@@ -882,8 +890,18 @@ const cuentaGratis = [
       pintarBoton();
     });
     video.addEventListener('pause', pintarBoton);
-    video.load();
-    intentar();
+    // El video arranca cuando la página ya cargó y el navegador está libre: el
+    // póster cubre mientras tanto, así no compite con la primera pintura.
+    const arrancar = () => {
+      ponerFuentes(video);
+      video.load();
+      listo = true;
+      intentar();
+    };
+    const enReposo = () =>
+      'requestIdleCallback' in window ? (window as any).requestIdleCallback(arrancar, { timeout: 2500 }) : setTimeout(arrancar, 800);
+    if (document.readyState === 'complete') enReposo();
+    else window.addEventListener('load', enReposo, { once: true });
     pausa.addEventListener('click', () => {
       if (video.paused) {
         pausadoPorUsuario = false;
@@ -905,7 +923,6 @@ const cuentaGratis = [
   const videoBanda = document.querySelector<HTMLVideoElement>('[data-video-banda]');
   const pausaBanda = document.querySelector<HTMLButtonElement>('[data-pausa-banda]');
   if (videoBanda && pausaBanda && !sinMovimiento && (navigator as any).connection?.saveData !== true) {
-    const ancho = window.innerWidth <= 900 ? '1280' : '1920';
     let cargado = false;
     let pausado = false;
     const texto = pausaBanda.querySelector<HTMLElement>('[data-pausa-texto]');
@@ -933,12 +950,7 @@ const cuentaGratis = [
         if (!e.isIntersecting) return videoBanda.pause();
         if (!cargado) {
           cargado = true;
-          for (const f of ['webm', 'mp4']) {
-            const s = document.createElement('source');
-            s.type = `video/${f}`;
-            s.src = videoBanda.getAttribute(`data-${f}-${ancho}`) ?? '';
-            videoBanda.appendChild(s);
-          }
+          ponerFuentes(videoBanda);
           videoBanda.load();
         }
         if (!pausado) videoBanda.play().catch(() => {});

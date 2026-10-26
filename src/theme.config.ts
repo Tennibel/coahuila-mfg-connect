@@ -35,11 +35,12 @@ const theme: ThemeConfig = {
   domain: 'coahuilamfgconnect.com',
   colorTema: '#00112F',
   seo: {
-    title: 'Coahuila MFG Connect · 9 y 10 de junio de 2027, Torreón',
+    title: 'Coahuila MFG Connect 2027 · Expo automotriz en Torreón',
     description:
-      'Encuentro de manufactura entre compradores y proveedores de México, Estados Unidos y Canadá. 9 y 10 de junio de 2027, Centro de Convenciones Torreón.',
-    // PNG generado en el build desde public/og-image.svg (WhatsApp y Facebook no muestran SVG).
-    ogImage: 'og-image.png',
+      'Exposición y encuentros B2B de la industria automotriz y de manufactura de México, EE. UU. y Canadá. 9 y 10 de junio de 2027, Torreón. Registro gratis.',
+    // Imagen para compartir (1200 × 630): cuadro del video de portada con el nombre,
+    // la fecha y la etapa gratis. Al terminar la etapa gratis (1-ene-2027) hay que rehacerla.
+    ogImage: 'og-portada.jpg',
   },
   // Sin cuenta de GA4 todavía (pendiente del cliente). Mientras esté vacío no
   // se carga analítica ni aparece el banner de cookies.
