@@ -19,7 +19,7 @@ import imgHero from '../assets/ia/08-hero-autos.png';
 import imgPiezas from '../assets/ia/01-piezas.png';
 import imgB2b from '../assets/ia/02-b2b.png';
 import imgForo from '../assets/ia/03-foro.png';
-import imgCnc from '../assets/ia/04-cnc.png';
+import imgCnc from '../assets/ia/10-stage-auto.jpg';
 import imgEnsamble from '../assets/ia/05-ensamble.png';
 import imgArneses from '../assets/ia/06-arneses.png';
 import imgBanda from '../assets/ia/09-banda-autos.png';
@@ -83,7 +83,14 @@ const hitos = [
   },
 ];
 const enGratis = Date.now() < etapas.finGratis;
-const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400000));
+// Contador de la etapa gratis: valores del build; el JS los corre cada segundo.
+const restaGratis = Math.max(0, etapas.finGratis - Date.now());
+const cuentaGratis = [
+  { u: 'd', n: Math.floor(restaGratis / 86400000), t: 'días' },
+  { u: 'h', n: Math.floor(restaGratis / 3600000) % 24, t: 'horas' },
+  { u: 'm', n: Math.floor(restaGratis / 60000) % 60, t: 'min' },
+  { u: 's', n: Math.floor(restaGratis / 1000) % 60, t: 'seg' },
+];
 ---
 
 <Layout schemaExtra={[faqSchema]}>
@@ -466,9 +473,8 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
             widths={[480, 800, 1168]}
             sizes="(min-width: 1024px) 50vw, 100vw"
             quality={60}
-            alt="Fresa de una máquina CNC cortando un bloque de aluminio con refrigerante (imagen ilustrativa)"
+            alt="Auto en holograma azul con el chasis y el cableado iluminados en rojo (imagen ilustrativa)"
             loading="lazy"
-            data-ia="higgsfield"
           />
         </figure>
         {
@@ -562,9 +568,6 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
               </p>
               <p class="etapa__precio">{etapas.gratis.precio}</p>
               <p class="etapa__fechas">{etapas.gratis.fechas}</p>
-              <p class="etapa__cuenta cifra" data-etapa-cuenta hidden={!enGratis}>
-                Quedan <span data-etapa-dias>{diasGratis}</span> días
-              </p>
             </li>
             <li class:list={['etapa', { 'etapa--actual': !enGratis }]} data-etapa="costo">
               <p class="etapa__cabeza">
@@ -575,6 +578,17 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
               <p class="etapa__fechas">{etapas.conCosto.fechas}</p>
             </li>
           </ol>
+          <div class="contador" data-etapa-cuenta hidden={!enGratis}>
+            <p class="contador__rotulo">El registro gratis termina en</p>
+            <ol class="contador__cifras" role="timer" aria-label="Tiempo para que termine el registro gratis">
+              {cuentaGratis.map((c) => (
+                <li>
+                  <span class="contador__numero cifra" data-cuenta-u={c.u}>{String(c.n).padStart(2, '0')}</span>
+                  <span class="contador__unidad">{c.t}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
           <dl class="boleto__datos">
             <div><dt class="fuerte">Incluye</dt><dd><Pendiente texto="qué incluye el boleto" /></dd></div>
             <div><dt class="fuerte">Cierre del registro</dt><dd><Pendiente texto="fecha" /></dd></div>
@@ -736,9 +750,21 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
     estado(e1, gratis ? 'Vigente' : 'Cerrada');
     estado(e2, gratis ? 'Próxima' : 'Vigente');
     const cuenta = panelEtapas.querySelector<HTMLElement>('[data-etapa-cuenta]');
-    const dias = panelEtapas.querySelector<HTMLElement>('[data-etapa-dias]');
     if (cuenta) cuenta.hidden = !gratis;
-    if (dias) dias.textContent = String(Math.max(0, Math.ceil((fin - Date.now()) / 86400000)));
+    if (cuenta && gratis) {
+      const celdas = ['d', 'h', 'm', 's'].map((u) => cuenta.querySelector<HTMLElement>(`[data-cuenta-u="${u}"]`));
+      const correr = () => {
+        const r = Math.max(0, fin - Date.now());
+        const v = [Math.floor(r / 86400000), Math.floor(r / 3600000) % 24, Math.floor(r / 60000) % 60, Math.floor(r / 1000) % 60];
+        celdas.forEach((c, i) => {
+          const t = String(v[i]).padStart(2, '0');
+          if (c && c.textContent !== t) c.textContent = t;
+        });
+        if (r === 0) location.reload();
+      };
+      correr();
+      setInterval(correr, 1000);
+    }
     const cta = panelEtapas.querySelector<HTMLElement>('[data-etapa-cta]');
     if (cta) cta.textContent = gratis ? 'Registrarme gratis' : 'Ir al registro';
   }
@@ -1800,6 +1826,9 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
     gap: var(--spacing-md);
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .stage__foto :global(img) {
+    object-position: 45% 50%;
+  }
   .stage__foto {
     grid-column: 1 / -1;
     margin: 0;
@@ -2024,9 +2053,55 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
   .etapa__fechas {
     color: var(--color-on-navy-muted);
   }
-  .etapa__cuenta {
+  /* Contador grande de la etapa gratis: cuatro celdas con cifras cian. */
+  .contador {
+    padding: 20px 16px 16px;
+    border: 1px solid rgb(1 246 250 / 0.35);
+    border-radius: 3px;
+    background: linear-gradient(180deg, rgb(1 246 250 / 0.08), rgb(0 17 47 / 0.2));
+  }
+  .contador[hidden] {
+    display: none;
+  }
+  .contador__rotulo {
+    margin: 0 0 12px;
+    font-size: 0.8125rem;
     font-weight: 700;
-    color: var(--color-on-navy);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-on-navy-muted);
+  }
+  .contador__cifras {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .contador__cifras li {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 12px 4px 10px;
+    border-radius: 3px;
+    background: rgb(0 17 47 / 0.55);
+  }
+  .contador__numero {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-signal-cyan);
+    text-shadow: 0 0 18px rgb(1 246 250 / 0.45);
+  }
+  .contador__unidad {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-on-navy-muted);
   }
   .boleto__datos {
     margin-bottom: 0;

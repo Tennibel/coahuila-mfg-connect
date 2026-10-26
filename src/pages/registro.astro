@@ -11,7 +11,9 @@
  * mandar datos en la URL. Cuando exista el servidor de cobro, este formulario
  * se conecta ahí (con validación en servidor, límite por IP y el campo trampa).
  */
+import { Picture } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
+import imgMotor from '../assets/ia/11-registro-motor.jpg';
 import Pendiente from '../components/Pendiente.astro';
 import { ruta } from '../lib/rutas';
 import { etapas } from '../content/evento';
@@ -31,7 +33,21 @@ const enGratis = Date.now() < etapas.finGratis;
 >
   <!-- Cabecera marina corta: h1 + aviso de vista previa -->
   <div class="registro__cabeza">
-    <div class="marco reticula">
+    <div class="registro__fondo" aria-hidden="true">
+      <Picture
+        src={imgMotor}
+        formats={['avif']}
+        fallbackFormat="webp"
+        widths={[640, 1024, 1600, 2400]}
+        sizes="100vw"
+        quality={55}
+        alt=""
+        loading="eager"
+        fetchpriority="high"
+      />
+      <div class="registro__velo"></div>
+    </div>
+    <div class="marco reticula registro__marco">
       <div class="col-contenido pila-lg">
         <h1>Registro de visitante</h1>
         <p class="entrada">
@@ -346,7 +362,44 @@ const enGratis = Date.now() < etapas.finGratis;
     line-height: 1.04;
   }
   .registro__cabeza {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     padding-block: var(--spacing-2xl) var(--spacing-xl);
+  }
+  /* Fondo: motor en holograma a la derecha; velo marino ≥ 0.80 bajo el texto. */
+  .registro__fondo {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .registro__fondo :global(picture),
+  .registro__fondo :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .registro__fondo :global(img) {
+    object-fit: cover;
+    object-position: 75% 50%;
+  }
+  .registro__velo {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgb(0 17 47 / 0.92) 0%, rgb(0 17 47 / 0.8) 50%, rgb(0 17 47 / 0.5) 64%, rgb(0 17 47 / 0.12) 100%);
+  }
+  @media (max-width: 1023px) {
+    .registro__velo {
+      background: rgb(0 17 47 / 0.82);
+    }
+  }
+  .registro__marco {
+    position: relative;
+  }
+  @media (min-width: 1024px) {
+    .registro__margen {
+      text-shadow: 0 1px 12px rgb(0 17 47 / 0.95), 0 0 2px rgb(0 17 47 / 0.9);
+    }
   }
   .registro__claro {
     padding-block: var(--spacing-2xl) var(--seccion);
