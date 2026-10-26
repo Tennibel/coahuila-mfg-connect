@@ -587,11 +587,15 @@ const hitos = [
       </div>
       <div>
         <dt class="fuerte">Medio oficial</dt>
-        <dd>Mexico Industry</dd>
+        <dd>
+          <span class="logo-placa">
+            <img src={ruta('media/logos/mexico-industry-news.svg')} alt="Mexico Industry News" width="129" height="48" loading="lazy" />
+          </span>
+        </dd>
       </div>
       <div>
         <dt class="fuerte">Logos</dt>
-        <dd><Pendiente texto="logos en vector y permiso de uso" /></dd>
+        <dd><Pendiente texto="logos en vector de ANAPSA, ADN de la Manufactura, aliados y CCT" /></dd>
       </div>
     </dl>
   </Seccion>
@@ -1853,6 +1857,18 @@ const hitos = [
   .aliados dd {
     margin: 6px 0 0;
     max-width: var(--spacing-measure);
+  }
+  .logo-placa {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 10px 14px;
+    background: #fff;
+    border-radius: 3px;
+  }
+  .logo-placa img {
+    display: block;
+    height: 48px;
+    width: auto;
   }
   @media (min-width: 1024px) {
     .organizan {

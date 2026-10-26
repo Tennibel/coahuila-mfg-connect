@@ -1,6 +1,6 @@
 ---
 /**
- * Cabecera — nombre del evento en texto (el logo en vector está pendiente) y
+ * Cabecera — logo del evento en vector y
  * navegación por anclas, en tipo oración. En la portada es fija y
  * transparente sobre el video; al bajar pasa a marino sólido con un filete de
  * 1 px. En las demás páginas es marina desde el inicio.
@@ -28,7 +28,7 @@ const enlaces = [
 <header class:list={['cabecera', { 'cabecera--portada': sobrePortada }]} data-cabecera>
   <div class="marco cabecera__fila">
     <a class="cabecera__nombre" href={ruta('')}>
-      {settings.negocio.nombre}
+      <img src={ruta('media/logos/coahuila-connect.svg')} alt={settings.negocio.nombre} width="185" height="50" />
     </a>
 
     <nav class="cabecera__nav" aria-label="Principal">
@@ -109,16 +109,18 @@ const enlaces = [
     min-height: var(--cabecera);
   }
   .cabecera__nombre {
-    font-weight: 600;
-    color: var(--color-on-navy);
-    text-decoration: none;
-    line-height: 1.25;
-    max-width: 22ch;
-    padding-block: 12px;
+    display: block;
+    padding-block: 10px;
   }
-  .cabecera__nombre:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--color-signal-cyan);
+  .cabecera__nombre img {
+    display: block;
+    height: 40px;
+    width: auto;
+  }
+  @media (min-width: 1024px) {
+    .cabecera__nombre img {
+      height: 48px;
+    }
   }
   .cabecera__nav {
     display: none;

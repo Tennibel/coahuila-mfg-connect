@@ -7,7 +7,7 @@ import { ruta } from '../lib/rutas';
 <footer class="pie">
   <div class="marco reticula pie__reticula">
     <div class="pie__datos pila">
-      <p class="pie__nombre">{settings.negocio.nombre}</p>
+      <img class="pie__logo" src={ruta('media/logos/coahuila-connect.svg')} alt={settings.negocio.nombre} width="222" height="60" loading="lazy" />
       <p>
         <span class="cifra">9 y 10 de junio de 2027</span>. {settings.sede.nombre}, {settings.sede.ciudad},
         {settings.sede.estado}.
@@ -27,6 +27,15 @@ import { ruta } from '../lib/rutas';
     </nav>
   </div>
 </footer>
+
+<style>
+  .pie__logo {
+    display: block;
+    height: 56px;
+    width: auto;
+    margin-bottom: 8px;
+  }
+</style>
 
 <style>
   .pie {
