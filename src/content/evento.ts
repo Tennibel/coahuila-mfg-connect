@@ -8,8 +8,8 @@
 
 /**
  * Boleto de visitante por etapas (Cori, 2026-10-26): registro gratis hasta el
- * 31 de diciembre de 2026; desde el 1 de enero de 2027 tiene costo (precio
- * pendiente). `finGratis` es la medianoche del 1 de enero en Torreón (UTC−6).
+ * 31 de diciembre de 2026; desde el 1 de enero de 2027 tiene costo. Por
+ * indicación de Cori no se muestra el precio de la etapa 2, solo que tendrá costo. `finGratis` es la medianoche del 1 de enero en Torreón (UTC−6).
  */
 export const etapas = {
   finGratis: Date.UTC(2027, 0, 1, 6),
@@ -34,7 +34,6 @@ export const preguntas: Pregunta[] = [
     pregunta: '¿Cuánto cuesta el boleto de visitante?',
     respuesta:
       'Es por etapas. Si se registra a más tardar el 31 de diciembre de 2026, su registro es gratis. Desde el 1 de enero de 2027 el boleto tiene costo.',
-    pendiente: 'precio desde el 1 de enero de 2027 y si hay tarifa para grupos',
   },
   {
     pregunta: '¿Cómo pago mi boleto?',

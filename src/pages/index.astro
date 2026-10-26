@@ -574,7 +574,7 @@ const cuentaGratis = [
                 <span class="etapa__rotulo cifra">{etapas.conCosto.rotulo}</span>
                 <span class="etapa__estado" data-etapa-estado>{enGratis ? 'Próxima' : 'Vigente'}</span>
               </p>
-              <p class="etapa__precio etapa__precio--pendiente"><Pendiente texto="precio" /></p>
+              <p class="etapa__precio">Con costo</p>
               <p class="etapa__fechas">{etapas.conCosto.fechas}</p>
             </li>
           </ol>
@@ -2043,12 +2043,6 @@ const cuentaGratis = [
   }
   .etapa--actual .etapa__precio {
     color: var(--color-signal-cyan);
-  }
-  .etapa__precio--pendiente {
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.4;
   }
   .etapa__fechas {
     color: var(--color-on-navy-muted);
