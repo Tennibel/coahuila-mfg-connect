@@ -29,7 +29,7 @@ export const preguntas: Pregunta[] = [
   {
     pregunta: '¿Cuándo y dónde es el evento?',
     respuesta:
-      'El 9 y 10 de junio de 2027 en el Centro de Convenciones Torreón, en Torreón, Coahuila. Las visitas industriales propuestas son el 8 de junio de 2027.',
+      'El 9 y 10 de junio de 2027 en el Expo Center Laguna, en Torreón, Coahuila. Las visitas industriales propuestas son el 8 de junio de 2027.',
   },
   {
     pregunta: '¿Cuánto cuesta el boleto de visitante?',

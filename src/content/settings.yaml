@@ -8,7 +8,7 @@
 negocio:
   nombre: Coahuila Automotive & Manufacturing Connect
   nombreCorto: Coahuila MFG Connect
-  descripcionCorta: Exposición, encuentros B2B, foro y conferencias técnicas de la industria automotriz y de manufactura de México, Estados Unidos y Canadá. 9 y 10 de junio de 2027, Centro de Convenciones Torreón.
+  descripcionCorta: Exposición, encuentros B2B, foro y conferencias técnicas de la industria automotriz y de manufactura de México, Estados Unidos y Canadá. 9 y 10 de junio de 2027, Expo Center Laguna.
 
 contacto:
   # WhatsApp: solo dígitos con lada de país (ej. 5218711234567). Vacío = pendiente; el botón flotante no aparece.
@@ -19,12 +19,12 @@ contacto:
   phone: ""
 
 sede:
-  nombre: Centro de Convenciones Torreón
+  nombre: Expo Center Laguna
   ciudad: Torreón
   estado: Coahuila
-  # Dirección confirmada por Cori el 2026-10-26.
+  # Recinto: Expo Center Laguna (cambio del cliente, 2026-10-26). Misma dirección.
   calle: "Blvd. Independencia y Libramiento Periférico Raúl López Sánchez, Sin Nombre de Col. 11"
   cp: "27018"
-  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Centro+de+Convenciones+Torre%C3%B3n%2C+Blvd.+Independencia+y+Perif%C3%A9rico+Ra%C3%BAl+L%C3%B3pez+S%C3%A1nchez%2C+27018+Torre%C3%B3n%2C+Coah."
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Expo+Center+Laguna%2C+Blvd.+Independencia+y+Perif%C3%A9rico+Ra%C3%BAl+L%C3%B3pez+S%C3%A1nchez%2C+27018+Torre%C3%B3n%2C+Coah."
 
 redes: []

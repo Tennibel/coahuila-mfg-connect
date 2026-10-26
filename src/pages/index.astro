@@ -156,6 +156,16 @@ const cuentaGratis = [
     <div class="marco hero__marco">
       <div class="hero__contenido">
         <span class="hero__meridiano" aria-hidden="true"><span class="destello destello--torreon"></span></span>
+        <img
+          class="hero__logo"
+          src={ruta('media/logos/coahuila-connect.svg')}
+          alt="Coahuila Automotive & Manufacturing Connect"
+          width="560"
+          height="151"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
         <h1 id="hero-titulo" class="hero__h1">La manufactura de México, Estados Unidos y Canadá se conecta en Torreón</h1>
         <div class="hero__fila">
         <div class="hero__datos entra" style="--k:1">
@@ -303,7 +313,7 @@ const cuentaGratis = [
     <div class="marco">
       <div class="cabeza-seccion" data-escalonar>
         <h2 id="agenda-titulo">Agenda: tres días en junio de 2027</h2>
-        <p class="entrada">Un día de visitas industriales y dos días de evento en el Centro de Convenciones Torreón.</p>
+        <p class="entrada">Un día de visitas industriales y dos días de evento en el Expo Center Laguna.</p>
       </div>
       <div class="linea-tiempo">
         <span class="linea-tiempo__linea" aria-hidden="true"></span>
@@ -611,7 +621,7 @@ const cuentaGratis = [
           <li>
             <span class="pasos__numero cifra">3</span>
             <h3>Preséntelo en el acceso</h3>
-            <p>En el Centro de Convenciones Torreón, el 9 o el 10 de junio de 2027.</p>
+            <p>En el Expo Center Laguna, el 9 o el 10 de junio de 2027.</p>
           </li>
         </ol>
       </div>
@@ -694,7 +704,7 @@ const cuentaGratis = [
   </section>
 
   <!-- ================= Sede ================= -->
-  <Seccion id="sede" titulo="Centro de Convenciones Torreón">
+  <Seccion id="sede" titulo="Expo Center Laguna">
     <dl class="ficha">
       <div><dt>Ciudad</dt><dd>Torreón, Coahuila, México</dd></div>
       <div><dt>Dirección</dt><dd>{settings.sede.calle}, C.P. {settings.sede.cp}, {settings.sede.ciudad}, {settings.sede.estado}.<br /><a class="enlace-suelto" href={settings.sede.mapsUrl} target="_blank" rel="noopener">Ver en Google Maps</a></dd></div>
@@ -972,8 +982,8 @@ const cuentaGratis = [
         return;
       }
       if (ahora >= inicioEvento) {
-        cuenta.innerHTML = '<span class="cuenta__hoy">Hoy, en el Centro de Convenciones Torreón</span>';
-        cuenta.setAttribute('aria-label', 'Hoy, en el Centro de Convenciones Torreón');
+        cuenta.innerHTML = '<span class="cuenta__hoy">Hoy, en el Expo Center Laguna</span>';
+        cuenta.setAttribute('aria-label', 'Hoy, en el Expo Center Laguna');
         return;
       }
       const dias = Math.ceil((inicioEvento - ahora) / 86400000);
@@ -1144,6 +1154,26 @@ const cuentaGratis = [
   @media (max-width: 767px) {
     .hero__velo {
       background: linear-gradient(to top, var(--color-navy) 0%, rgb(0 17 47 / 0.86) 40%, rgb(0 17 47 / 0.8) 100%);
+    }
+  }
+  /* Logo del evento en grande sobre el título (pedido del cliente). */
+  .hero__logo {
+    display: block;
+    width: min(100%, 300px);
+    height: auto;
+    margin-bottom: var(--spacing-lg);
+    /* El SVG trae margen a la izquierda: se recorre para alinear con el título. */
+    transform: translateX(-3.6%);
+    filter: drop-shadow(0 0 24px rgb(1 246 250 / 0.25));
+  }
+  @media (min-width: 768px) {
+    .hero__logo {
+      width: 460px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .hero__logo {
+      width: 560px;
     }
   }
   .hero__marco {
