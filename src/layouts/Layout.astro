@@ -52,6 +52,8 @@ const evento = {
     name: settings.sede.nombre,
     address: {
       '@type': 'PostalAddress',
+      streetAddress: settings.sede.calle,
+      postalCode: settings.sede.cp,
       addressLocality: settings.sede.ciudad,
       addressRegion: settings.sede.estado,
       addressCountry: 'MX',

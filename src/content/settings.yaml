@@ -22,9 +22,9 @@ sede:
   nombre: Centro de Convenciones Torreón
   ciudad: Torreón
   estado: Coahuila
-  # Dirección exacta y enlace de mapa: pendientes del cliente.
-  calle: ""
-  cp: ""
-  mapsUrl: ""
+  # Dirección confirmada por Cori el 2026-10-26.
+  calle: "Blvd. Independencia y Libramiento Periférico Raúl López Sánchez, Sin Nombre de Col. 11"
+  cp: "27018"
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Centro+de+Convenciones+Torre%C3%B3n%2C+Blvd.+Independencia+y+Perif%C3%A9rico+Ra%C3%BAl+L%C3%B3pez+S%C3%A1nchez%2C+27018+Torre%C3%B3n%2C+Coah."
 
 redes: []
