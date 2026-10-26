@@ -6,12 +6,14 @@
  * de registro es una vista previa que no guarda datos.
  */
 import PaginaTexto from '../components/PaginaTexto.astro';
-import Pendiente from '../components/Pendiente.astro';
 import theme from '../theme.config';
 import { responsable, domicilio, correoPrivacidad, nombreComercial, datosFormulario } from '../lib/legal';
 import { ruta } from '../lib/rutas';
 
-const correo = correoPrivacidad();
+import settings from '../content/settings';
+
+// Sin correo propio para datos personales: se usa el de contacto del evento.
+const correo = correoPrivacidad().startsWith('[pendiente:') ? settings.contacto.email : correoPrivacidad();
 const pend = (s: string) => s.startsWith('[pendiente:');
 ---
 
@@ -29,8 +31,7 @@ const pend = (s: string) => s.startsWith('[pendiente:');
 
   <h2>Quién es responsable de sus datos</h2>
   <p>
-    {pend(responsable()) ? <Pendiente texto="razón social del responsable de los datos" /> : responsable()}, con
-    domicilio en {pend(domicilio()) ? <Pendiente texto="domicilio del responsable" /> : domicilio()}, es responsable del
+    {pend(responsable()) ? 'Los organizadores del evento, ANAPSA y ADN de la Manufactura,' : responsable()}{pend(domicilio()) ? '' : `, con domicilio en ${domicilio()},`} {pend(responsable()) ? 'son responsables' : 'es responsable'} del
     tratamiento de los datos personales que usted proporcione al registrarse en <strong>{nombreComercial}</strong> a
     través de <strong>{theme.domain}</strong>, conforme a la Ley Federal de Protección de Datos Personales en Posesión de
     los Particulares.
@@ -62,7 +63,7 @@ const pend = (s: string) => s.startsWith('[pendiente:');
   </ul>
   <p>
     Si no desea que usemos sus datos para las finalidades adicionales, escríbanos a
-    {pend(correo) ? <Pendiente texto="correo para datos personales" /> : <a href={`mailto:${correo}`}>{correo}</a>}.
+    <a href={`mailto:${correo}`}>{correo}</a>.
     Su negativa no afecta su registro.
   </p>
 
@@ -77,18 +78,12 @@ const pend = (s: string) => s.startsWith('[pendiente:');
     <li>Google, donde se lleva la hoja de registro de asistentes.</li>
     <li>El proveedor de alojamiento del sitio.</li>
   </ul>
-  <p>
-    Otras transferencias (por ejemplo, a expositores o patrocinadores): <Pendiente texto="confirmar si habrá alguna; si la hay, requiere su consentimiento" />.
-  </p>
-
-  <h2>Cuánto tiempo conservamos sus datos</h2>
-  <p><Pendiente texto="plazo de conservación después del evento" /></p>
 
   <h2>Sus derechos ARCO</h2>
   <p>
     Usted puede acceder a sus datos, rectificarlos, cancelarlos u oponerse a su uso (derechos ARCO), así como revocar su
     consentimiento o limitar el uso de sus datos. Envíe su solicitud a
-    {pend(correo) ? <Pendiente texto="correo para datos personales" /> : <a href={`mailto:${correo}`}>{correo}</a>} con:
+    <a href={`mailto:${correo}`}>{correo}</a> con:
   </p>
   <ul>
     <li>Su nombre y un medio para responderle.</li>

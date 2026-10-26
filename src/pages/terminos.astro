@@ -5,7 +5,6 @@
  * Cubre también el aviso legal (titular del sitio y condiciones de uso).
  */
 import PaginaTexto from '../components/PaginaTexto.astro';
-import Pendiente from '../components/Pendiente.astro';
 import theme from '../theme.config';
 import settings from '../content/settings';
 import { responsable, domicilio, nombreComercial } from '../lib/legal';
@@ -23,10 +22,9 @@ const pend = (s: string) => s.startsWith('[pendiente:');
 >
   <h2>Titular del sitio</h2>
   <p>
-    Este sitio, sobre el evento <strong>{nombreComercial}</strong>, pertenece a
-    {pend(responsable()) ? <Pendiente texto="razón social del titular" /> : responsable()}, con domicilio en
-    {pend(domicilio()) ? <Pendiente texto="domicilio del titular" /> : domicilio()}. Dominio definitivo:
-    {theme.domain}. Contacto: <a href={`mailto:${settings.contacto.email}`}>{settings.contacto.email}</a>.
+    Este sitio, sobre el evento <strong>{nombreComercial}</strong>, es de los organizadores del evento
+    {pend(responsable()) ? 'ANAPSA y ADN de la Manufactura' : responsable()}{pend(domicilio()) ? '' : `, con domicilio en ${domicilio()}`}.
+    Dominio definitivo: {theme.domain}. Contacto: <a href={`mailto:${settings.contacto.email}`}>{settings.contacto.email}</a>.
   </p>
 
   <h2>Uso del sitio</h2>
@@ -46,16 +44,11 @@ const pend = (s: string) => s.startsWith('[pendiente:');
       Precio por etapas: gratis para quien se registre a más tardar el 31 de diciembre de 2026. Desde el 1 de enero de
       2027 el boleto tiene costo.
     </li>
-    <li>Qué incluye: <Pendiente texto="exposición, foro y stage; las citas B2B son para expositores" />.</li>
+    <li>Las citas B2B son para expositores; el boleto de visitante no las incluye.</li>
     <li>
       Pago (desde el 1 de enero de 2027): en línea con Mercado Pago. El QR individual se envía por correo cuando el pago queda aprobado. En pagos en
       efectivo, si la ficha vence sin pagarse, el lugar se libera.
     </li>
-    <li>Cambios, cancelación y reembolso: <Pendiente texto="política del cliente" />.</li>
-    <li>Transferencia del boleto a otra persona: <Pendiente texto="si se permite y cómo" />.</li>
-    <li>Factura: <Pendiente texto="si se factura y cómo se pide" />.</li>
-    <li>Requisitos de acceso: <Pendiente texto="edad mínima, perfil profesional, gafete e identificación" />.</li>
-    <li>Cupo máximo y fechas de registro: <Pendiente texto="cupo y apertura y cierre del registro" />.</li>
   </ul>
 
   <h2>Datos personales</h2>
@@ -63,7 +56,6 @@ const pend = (s: string) => s.startsWith('[pendiente:');
 
   <h2>Legislación aplicable</h2>
   <p>
-    Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se
-    someten a los tribunales competentes de <Pendiente texto="ciudad de jurisdicción" />.
+    Estos términos se rigen por las leyes de los Estados Unidos Mexicanos.
   </p>
 </PaginaTexto>

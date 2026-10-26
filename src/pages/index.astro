@@ -317,7 +317,6 @@ const cuentaGratis = [
               <ul class="hito__lista">
                 {h.actividades.map((a) => <li>{a}</li>)}
               </ul>
-              <p class="nota hito__horario">Horarios: <Pendiente texto="horarios" /></p>
             </li>
           ))
         }
@@ -415,7 +414,7 @@ const cuentaGratis = [
       <div class="panel chaflan b2b__panel pila">
         <p class="fuerte">
           Las citas B2B son solo para expositores: para tener agenda es indispensable exponer. El boleto de visitante no
-          incluye citas (<Pendiente texto="confirmar qué incluye el boleto de visitante" />).
+          incluye citas.
         </p>
         <p>
           El programa B2B tiene un patrocinio exclusivo, con cotización a la medida: presencia de marca en el área de
@@ -485,11 +484,6 @@ const cuentaGratis = [
           ))
         }
       </div>
-    </div>
-
-    <div class="panel chaflan ponentes">
-      <h3>Ponentes</h3>
-      <p><Pendiente texto="ponentes por confirmar" /></p>
     </div>
   </Seccion>
 
@@ -590,8 +584,6 @@ const cuentaGratis = [
             </ol>
           </div>
           <dl class="boleto__datos">
-            <div><dt class="fuerte">Incluye</dt><dd><Pendiente texto="qué incluye el boleto" /></dd></div>
-            <div><dt class="fuerte">Cierre del registro</dt><dd><Pendiente texto="fecha" /></dd></div>
           </dl>
           <p>
             <a class="boton boton--brillo" href={ruta('registro/')} data-cta="ir_registro" data-cta-location="boletos"><span data-etapa-cta>{enGratis ? 'Registrarme gratis' : 'Ir al registro'}</span><span class="boton__barrido" aria-hidden="true"></span></a>
@@ -653,8 +645,13 @@ const cuentaGratis = [
           <span class="logo-placa">
             <img src={ruta('media/logos/atms.svg')} alt="ATMS, Asociación para Tecnologías, Manufactura y Soluciones, A.C." width="170" height="48" loading="lazy" />
           </span>
+          <span class="logo-placa">
+            <img src={ruta('media/logos/concanaco.svg')} alt="CONCANACO SERVYTUR México" width="313" height="48" loading="lazy" />
           </span>
-          <p class="aliados__texto">CONCANACO SERVYTUR México y CANACINTRA</p>
+          <span class="logo-placa">
+            <img src={ruta('media/logos/canacintra.png')} alt="CANACINTRA" width="261" height="48" loading="lazy" />
+          </span>
+          </span>
         </dd>
       </div>
       <div>
@@ -664,10 +661,6 @@ const cuentaGratis = [
             <img src={ruta('media/logos/mexico-industry-news.svg')} alt="Mexico Industry News" width="129" height="48" loading="lazy" />
           </span>
         </dd>
-      </div>
-      <div>
-        <dt class="fuerte">Logos</dt>
-        <dd><Pendiente texto="logos de CONCANACO, CANACINTRA y CCT" /></dd>
       </div>
     </dl>
   </Seccion>
@@ -684,8 +677,7 @@ const cuentaGratis = [
           para el 8 de junio, con cupo limitado y sujetas a la autorización de las plantas.
         </p>
         <p>
-          Para patrocinar, hay un patrocinio exclusivo del programa B2B, con cotización a la medida. Paquetes:
-          <Pendiente texto="qué incluye cada paquete de expositor y de patrocinio" />.
+          Para patrocinar, hay un patrocinio exclusivo del programa B2B, con cotización a la medida.
         </p>
         <p class="nota">Expositores y patrocinadores no se registran en línea: escríbanos y le enviamos la información.</p>
         <ul class="contacto">
@@ -694,7 +686,6 @@ const cuentaGratis = [
             <a class="boton boton--contorno boton--brillo" href={`mailto:${correo}?subject=${encodeURIComponent('Exponer o patrocinar en Coahuila MFG Connect')}`} data-cta="pedir_informacion" data-cta-location="expositores">Pedir información<span class="boton__barrido" aria-hidden="true"></span></a>
             <span class="nota">{correo}</span>
           </li>
-          <li><span class="nota">Teléfono o WhatsApp: <Pendiente texto="número de contacto" /></span></li>
         </ul>
       </div>
     </div>
@@ -705,8 +696,6 @@ const cuentaGratis = [
     <dl class="ficha">
       <div><dt>Ciudad</dt><dd>Torreón, Coahuila, México</dd></div>
       <div><dt>Dirección</dt><dd>{settings.sede.calle}, C.P. {settings.sede.cp}, {settings.sede.ciudad}, {settings.sede.estado}.<br /><a class="enlace-suelto" href={settings.sede.mapsUrl} target="_blank" rel="noopener">Ver en Google Maps</a></dd></div>
-      <div><dt>Estacionamiento</dt><dd><Pendiente texto="estacionamiento" /></dd></div>
-      <div><dt>Hospedaje</dt><dd><Pendiente texto="hoteles sede o convenios, si los hay" /></dd></div>
     </dl>
   </Seccion>
 
@@ -722,7 +711,6 @@ const cuentaGratis = [
             </summary>
             <div class="faq__respuesta pila">
               <p set:html={p.respuesta} />
-              {p.pendiente && <p><Pendiente texto={p.pendiente} /></p>}
             </div>
           </details>
         ))
@@ -2164,15 +2152,12 @@ const cuentaGratis = [
     height: 40px;
     max-width: 100%;
   }
-  .aliados__texto {
-    margin: 10px 0 0;
-  }
   .aliados dd {
     margin: 6px 0 0;
-    max-width: var(--spacing-measure);
   }
   .logo-placa {
     display: inline-block;
+    max-width: 100%;
     margin-top: 6px;
     padding: 10px 14px;
     background: #fff;
@@ -2182,6 +2167,8 @@ const cuentaGratis = [
     display: block;
     height: 48px;
     width: auto;
+    max-width: 100%;
+    object-fit: contain;
   }
   @media (min-width: 1024px) {
     .organizan {
@@ -2189,7 +2176,7 @@ const cuentaGratis = [
       column-gap: var(--spacing-gutter);
     }
     .aliados {
-      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-columns: 3fr 1fr;
       column-gap: var(--spacing-gutter);
     }
   }
