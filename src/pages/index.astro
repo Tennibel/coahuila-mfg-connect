@@ -15,14 +15,14 @@ import settings from '../content/settings';
 import { preguntas, etapas } from '../content/evento';
 import { ruta } from '../lib/rutas';
 
-import imgHero from '../assets/ia/00-hero-robot.png';
+import imgHero from '../assets/ia/08-hero-autos.png';
 import imgPiezas from '../assets/ia/01-piezas.png';
 import imgB2b from '../assets/ia/02-b2b.png';
 import imgForo from '../assets/ia/03-foro.png';
 import imgCnc from '../assets/ia/04-cnc.png';
 import imgEnsamble from '../assets/ia/05-ensamble.png';
 import imgArneses from '../assets/ia/06-arneses.png';
-import imgRed from '../assets/ia/07-red.png';
+import imgBanda from '../assets/ia/09-banda-autos.png';
 
 const correo = settings.contacto.email;
 
@@ -121,7 +121,7 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
         widths={ANCHOS_HERO}
         sizes="100vw"
         quality={55}
-        alt="Brazo robótico sobre una carcasa de motor en una planta iluminada en azul (imagen ilustrativa)"
+        alt="Auto deportivo en holograma azul que deja ver motor, suspensión y chasis (imagen ilustrativa)"
         loading="eager"
         fetchpriority="high"
         decoding="async"
@@ -323,18 +323,35 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
   <section class="banda banda--foto union" aria-labelledby="banda-registro-titulo">
     <div class="banda__foto" data-revelar data-parallax="0.18">
       <Picture
-        src={imgRed}
+        src={imgBanda}
         formats={['avif']}
         fallbackFormat="webp"
-        widths={[640, 1024, 1600, 2400]}
+        widths={[640, 1024, 1600, 1920]}
         sizes="100vw"
         quality={55}
-        alt="Mapa de Norteamérica en azul con una red de puntos de luz (imagen ilustrativa)"
+        alt="Chasis de un auto con el contorno de la carrocería trazado en luz naranja (imagen ilustrativa)"
         loading="lazy"
-        data-ia="higgsfield"
       />
     </div>
+    <video
+      class="banda__video"
+      muted
+      loop
+      playsinline
+      preload="none"
+      aria-hidden="true"
+      data-video-banda
+      data-webm-1920={ruta('media/banda-autos-1920.webm')}
+      data-mp4-1920={ruta('media/banda-autos-1920.mp4')}
+      data-webm-1280={ruta('media/banda-autos-1280.webm')}
+      data-mp4-1280={ruta('media/banda-autos-1280.mp4')}
+    ></video>
     <div class="banda__velo"></div>
+    <button class="hero__pausa banda__pausa" type="button" hidden data-pausa-banda>
+      <span class="hero__pausa-icono" data-icono-pausa><Icono nombre="pause" tamano={20} /></span>
+      <span class="hero__pausa-icono" data-icono-play hidden><Icono nombre="play" tamano={20} /></span>
+      <span data-pausa-texto>Pausar video</span>
+    </button>
     <span class="destello destello--banda destello--b1" aria-hidden="true"></span>
     <span class="destello destello--banda destello--b2 destello--tarde" aria-hidden="true"></span>
     <div class="marco banda__contenido" data-escalonar>
@@ -597,19 +614,34 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
   <Seccion id="organizadores" titulo="Lo organizan ANAPSA y ADN de la Manufactura">
     <div class="organizan" data-escalonar>
       <div class="pila">
-        <h3>ANAPSA</h3>
-        <p class="nota">Agencia Nacional del Sector Automotriz</p>
+        <h3 class="organizan__logo">
+          <img src={ruta('media/logos/anapsa.svg')} alt="ANAPSA, Agencia Nacional del Sector Automotriz" width="148" height="90" loading="lazy" />
+        </h3>
         <p>Vincula a armadoras y fabricantes de autopartes con proveedores de México, Estados Unidos y Canadá.</p>
       </div>
       <div class="pila">
-        <h3>ADN de la Manufactura</h3>
+        <h3 class="organizan__logo">
+          <span class="logo-placa">
+            <img src={ruta('media/logos/adn.svg')} alt="ADN de la Manufactura" width="389" height="48" loading="lazy" />
+          </span>
+        </h3>
         <p>Organiza encuentros B2B, exposiciones y espacios técnicos para distintos sectores industriales.</p>
       </div>
     </div>
     <dl class="aliados">
       <div>
         <dt class="fuerte">Aliados</dt>
-        <dd>CONCANACO SERVYTUR México, ATMS (Asociación para Tecnologías, Manufactura y Soluciones, A.C.) y CANACINTRA</dd>
+        <dd>
+          <span class="logos-fila">
+          <span class="logo-placa">
+            <img src={ruta('media/logos/costep.svg')} alt="COSTEP" width="122" height="48" loading="lazy" />
+          </span>
+          <span class="logo-placa">
+            <img src={ruta('media/logos/atms.svg')} alt="ATMS, Asociación para Tecnologías, Manufactura y Soluciones, A.C." width="170" height="48" loading="lazy" />
+          </span>
+          </span>
+          <p class="aliados__texto">CONCANACO SERVYTUR México y CANACINTRA</p>
+        </dd>
       </div>
       <div>
         <dt class="fuerte">Medio oficial</dt>
@@ -621,7 +653,7 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
       </div>
       <div>
         <dt class="fuerte">Logos</dt>
-        <dd><Pendiente texto="logos en vector de ANAPSA, ADN de la Manufactura, aliados y CCT" /></dd>
+        <dd><Pendiente texto="logos de CONCANACO, CANACINTRA y CCT" /></dd>
       </div>
     </dl>
   </Seccion>
@@ -853,6 +885,52 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
       else video.pause();
     }).observe(video);
     document.addEventListener('visibilitychange', () => (document.hidden ? video.pause() : intentar()));
+  }
+
+  // ---------- Video de la banda «Registrarme»: solo corre cuando se ve ----------
+  const videoBanda = document.querySelector<HTMLVideoElement>('[data-video-banda]');
+  const pausaBanda = document.querySelector<HTMLButtonElement>('[data-pausa-banda]');
+  if (videoBanda && pausaBanda && !sinMovimiento && (navigator as any).connection?.saveData !== true) {
+    const ancho = window.innerWidth <= 900 ? '1280' : '1920';
+    let cargado = false;
+    let pausado = false;
+    const texto = pausaBanda.querySelector<HTMLElement>('[data-pausa-texto]');
+    const iPausa = pausaBanda.querySelector<HTMLElement>('[data-icono-pausa]');
+    const iPlay = pausaBanda.querySelector<HTMLElement>('[data-icono-play]');
+    const pintar = () => {
+      const corriendo = !videoBanda.paused;
+      if (texto) texto.textContent = corriendo ? 'Pausar video' : 'Reproducir video';
+      if (iPausa) iPausa.hidden = !corriendo;
+      if (iPlay) iPlay.hidden = corriendo;
+    };
+    videoBanda.addEventListener('playing', () => {
+      videoBanda.classList.add('activo');
+      pausaBanda.hidden = false;
+      pintar();
+    });
+    videoBanda.addEventListener('pause', pintar);
+    pausaBanda.addEventListener('click', () => {
+      pausado = !videoBanda.paused;
+      if (pausado) videoBanda.pause();
+      else videoBanda.play().catch(() => {});
+    });
+    new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return videoBanda.pause();
+        if (!cargado) {
+          cargado = true;
+          for (const f of ['webm', 'mp4']) {
+            const s = document.createElement('source');
+            s.type = `video/${f}`;
+            s.src = videoBanda.getAttribute(`data-${f}-${ancho}`) ?? '';
+            videoBanda.appendChild(s);
+          }
+          videoBanda.load();
+        }
+        if (!pausado) videoBanda.play().catch(() => {});
+      },
+      { rootMargin: '200px 0px' }
+    ).observe(videoBanda);
   }
 
   // ---------- Cuenta regresiva (solo días; se actualiza cada minuto) ----------
@@ -1573,6 +1651,30 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
     object-fit: cover;
     object-position: 60% 50%;
   }
+  .banda__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 50%;
+    opacity: 0;
+    transition: opacity 400ms var(--curva);
+  }
+  .banda__video:global(.activo) {
+    opacity: 1;
+  }
+  .banda__pausa {
+    top: auto;
+    bottom: 8px;
+    right: 8px;
+    z-index: 1;
+  }
+  .logos-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
   .banda__velo {
     position: absolute;
     inset: 0;
@@ -1983,6 +2085,18 @@ const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400
     gap: var(--spacing-lg);
     border-top: 1px solid var(--color-navy-panel);
     padding-top: var(--spacing-xl);
+  }
+  .organizan__logo > img {
+    display: block;
+    height: 90px;
+    width: auto;
+  }
+  .organizan__logo .logo-placa img {
+    height: 40px;
+    max-width: 100%;
+  }
+  .aliados__texto {
+    margin: 10px 0 0;
   }
   .aliados dd {
     margin: 6px 0 0;
