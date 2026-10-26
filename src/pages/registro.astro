@@ -14,9 +14,13 @@
 import Layout from '../layouts/Layout.astro';
 import Pendiente from '../components/Pendiente.astro';
 import { ruta } from '../lib/rutas';
+import { etapas } from '../content/evento';
 
 const areas = ['Compras', 'Desarrollo de proveedores', 'Ingeniería', 'Manufactura', 'Operaciones', 'Dirección de planta', 'Otra'];
 const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
+// Tipo de empresa (Cori, 2026-10-26).
+const tipos = ['Empresa compradora', 'Empresa proveedora', 'Empresa de servicios', 'Empresa patrocinadora'];
+const enGratis = Date.now() < etapas.finGratis;
 
 ---
 
@@ -40,7 +44,8 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
         </p>
       </div>
       <div class="col-margen registro__margen nota pila">
-        <p>Boleto de visitante: <Pendiente texto="precio y qué incluye" /></p>
+        <p>Boleto de visitante: gratis hasta el 31 de diciembre de 2026. Desde el 1 de enero de 2027: <Pendiente texto="precio" />.</p>
+        <p>Qué incluye: <Pendiente texto="qué incluye el boleto" /></p>
         <p>Las citas B2B son para expositores.</p>
       </div>
     </div>
@@ -95,6 +100,18 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
                   <p class="campo__error" id="cargo-error" hidden></p>
                 </div>
               </div>
+              <fieldset class="opciones opciones--tipo" data-grupo="tipo" data-error="Elija el tipo de empresa.">
+                <legend class="campo__leyenda">Tipo de empresa</legend>
+                <div class="tipos">
+                  {tipos.map((t, i) => (
+                    <label class="opcion" for={`tipo-${i}`}>
+                      <input id={`tipo-${i}`} type="radio" name="tipo" value={t} required />
+                      <span>{t}</span>
+                    </label>
+                  ))}
+                </div>
+                <p class="campo__error" id="tipo-error" hidden></p>
+              </fieldset>
               <div class="form__fila">
                 <div class="campo">
                   <label for="area">Área en la que trabaja</label>
@@ -115,11 +132,16 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
               </div>
             </fieldset>
 
-            <fieldset class="opciones" data-grupo="pago" data-error="Elija cómo pagaría.">
+            <fieldset class="opciones" data-grupo="pago" data-error="Elija cómo pagaría." data-fin-gratis={etapas.finGratis}>
               <legend class="form__grupo">Boleto y pago</legend>
               <p class="opciones__boleto">
-                Boleto de visitante: <Pendiente texto="precio" />
+                Gratis si se registra a más tardar el 31 de diciembre de 2026. Desde el 1 de enero de 2027:
+                <Pendiente texto="precio" />.
               </p>
+              <p class="opciones__gratis" data-pago-gratis hidden={!enGratis}>
+                <span class="fuerte">Hoy su registro es gratis:</span> no tiene que elegir forma de pago.
+              </p>
+              <div data-pago-opciones hidden={enGratis}>
               <label class="opcion" for="pago-tarjeta">
                 <input id="pago-tarjeta" type="radio" name="pago" value="Tarjeta de crédito o débito" required />
                 <span>Tarjeta de crédito o débito, con Mercado Pago</span>
@@ -128,6 +150,7 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
                 <input id="pago-efectivo" type="radio" name="pago" value="Efectivo en tienda de conveniencia" />
                 <span>Efectivo en tienda de conveniencia, con Mercado Pago</span>
               </label>
+              </div>
               <p class="campo__error" id="pago-error" hidden></p>
             </fieldset>
 
@@ -166,12 +189,15 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
               registro esté activo, pasaría esto:
             </p>
             <ol class="resultado__pasos">
-              <li>
+              <li data-resumen="paso-pago">
                 <span class="fuerte">Pago.</span> Le llevaríamos a Mercado Pago para pagar su boleto con
                 <span data-resumen="pago"></span>.
               </li>
+              <li data-resumen="paso-gratis" hidden>
+                <span class="fuerte">Sin pago.</span> Se registró en la etapa gratis: su boleto no tiene costo.
+              </li>
               <li>
-                <span class="fuerte">QR por correo.</span> Cuando el pago quedara aprobado, le llegaría a
+                <span class="fuerte">QR por correo.</span> <span data-resumen="cuando-qr">Cuando el pago quedara aprobado</span>, le llegaría a
                 <span class="fuerte" data-resumen="correo"></span> un QR individual.
                 <span data-resumen="efectivo" hidden>Con pago en efectivo, primero recibiría las instrucciones; si la ficha vence sin pagarse, el lugar se libera.</span>
               </li>
@@ -195,6 +221,7 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
             <dl class="resumen" aria-label="Datos que escribió (no se guardaron)">
               <div><dt>Nombre</dt><dd data-resumen="nombre"></dd></div>
               <div><dt>Empresa y cargo</dt><dd data-resumen="empresa"></dd></div>
+              <div><dt>Tipo de empresa</dt><dd data-resumen="tipo"></dd></div>
               <div><dt>Área y país</dt><dd data-resumen="area"></dd></div>
             </dl>
 
@@ -204,8 +231,8 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
           </section>
         </div>
         <div class="col-margen nota pila registro__ayuda">
-          <p>Pago con Mercado Pago cuando el registro esté activo.</p>
-          <p>QR individual por correo cuando el pago queda aprobado.</p>
+          <p>Gratis hasta el 31 de diciembre de 2026. Después, pago con Mercado Pago.</p>
+          <p>QR individual por correo al registrarse gratis o cuando el pago queda aprobado.</p>
           <p>
             Dudas: <a class="enlace-suelto" href="mailto:info@coahuilamfgconnect.com">info@coahuilamfgconnect.com</a>
           </p>
@@ -223,6 +250,17 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
   if (form && resultado) {
     const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
     if (boton) boton.disabled = false;
+
+    // Etapa del boleto: hasta el 31 de diciembre de 2026 el registro es gratis
+    // y no se pide forma de pago.
+    const grupoPago = form.querySelector<HTMLElement>('[data-grupo="pago"]');
+    const gratis = Date.now() < Number(grupoPago?.dataset.finGratis ?? 0);
+    const opcionesPago = form.querySelector<HTMLElement>('[data-pago-opciones]');
+    const notaGratis = form.querySelector<HTMLElement>('[data-pago-gratis]');
+    if (opcionesPago) opcionesPago.hidden = gratis;
+    if (notaGratis) notaGratis.hidden = !gratis;
+    form.querySelectorAll<HTMLInputElement>('input[name="pago"]').forEach((r) => (r.required = !gratis));
+    const grupos = gratis ? ['tipo'] : ['tipo', 'pago'];
 
     const mostrarError = (id: string, mensaje: string, control?: HTMLElement | null) => {
       const p = document.getElementById(`${id}-error`);
@@ -244,17 +282,19 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
         mostrarError(c.id, ok ? '' : c.dataset.error ?? 'Revise este campo.', c);
         if (!ok && !primero) primero = c;
       });
-      const grupo = form.querySelector<HTMLElement>('[data-grupo="pago"]');
-      const pago = form.querySelector<HTMLInputElement>('input[name="pago"]:checked');
-      mostrarError('pago', pago ? '' : grupo?.dataset.error ?? '', null);
-      if (!pago && !primero) primero = form.querySelector<HTMLInputElement>('input[name="pago"]');
+      grupos.forEach((g) => {
+        const grupo = form.querySelector<HTMLElement>(`[data-grupo="${g}"]`);
+        const elegido = form.querySelector<HTMLInputElement>(`input[name="${g}"]:checked`);
+        mostrarError(g, elegido ? '' : grupo?.dataset.error ?? '', null);
+        if (!elegido && !primero) primero = form.querySelector<HTMLInputElement>(`input[name="${g}"]`);
+      });
       return primero;
     };
 
     form.addEventListener('input', (e) => {
       const c = e.target as HTMLInputElement;
       if (c.getAttribute('aria-invalid') === 'true' && c.checkValidity()) mostrarError(c.id, '', c);
-      if (c.name === 'pago') mostrarError('pago', '', null);
+      if (c.name === 'pago' || c.name === 'tipo') mostrarError(c.name, '', null);
     });
 
     form.addEventListener('submit', (e) => {
@@ -277,8 +317,15 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
       poner('nombre', `${v('nombre')} ${v('apellidos')}`);
       poner('empresa', `${v('empresa')}, ${v('cargo')}`);
       poner('area', `${v('area')}, ${v('pais')}`);
-      const efectivo = resultado.querySelector<HTMLElement>('[data-resumen="efectivo"]');
-      if (efectivo) efectivo.hidden = !/efectivo/i.test(pago);
+      poner('tipo', form.querySelector<HTMLInputElement>('input[name="tipo"]:checked')?.value ?? '');
+      poner('cuando-qr', gratis ? 'Al quedar registrado' : 'Cuando el pago quedara aprobado');
+      const ver = (clave: string, si: boolean) => {
+        const el = resultado.querySelector<HTMLElement>(`[data-resumen="${clave}"]`);
+        if (el) el.hidden = !si;
+      };
+      ver('paso-pago', !gratis);
+      ver('paso-gratis', gratis);
+      ver('efectivo', !gratis && /efectivo/i.test(pago));
 
       form.hidden = true;
       resultado.hidden = false;
@@ -403,6 +450,28 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
   }
   .opciones__boleto {
     margin-bottom: var(--spacing-md);
+  }
+  .opciones__gratis {
+    margin-bottom: 0;
+    padding: 12px 16px;
+    border-left: 3px solid var(--color-primary);
+    background: rgb(9 92 228 / 0.06);
+  }
+  .opciones--tipo {
+    margin-top: var(--spacing-lg);
+  }
+  .campo__leyenda {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .tipos {
+    display: grid;
+    column-gap: var(--spacing-lg);
+  }
+  @media (min-width: 640px) {
+    .tipos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
   /* Toda la fila (control + texto) es la etiqueta: área clicable ≥ 44 px. */
   .opcion {

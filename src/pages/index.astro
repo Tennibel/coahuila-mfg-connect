@@ -12,7 +12,7 @@ import Seccion from '../components/Seccion.astro';
 import Pendiente from '../components/Pendiente.astro';
 import Icono from '../components/Icono.astro';
 import settings from '../content/settings';
-import { preguntas } from '../content/evento';
+import { preguntas, etapas } from '../content/evento';
 import { ruta } from '../lib/rutas';
 
 import imgHero from '../assets/ia/00-hero-robot.png';
@@ -82,6 +82,8 @@ const hitos = [
     actividades: ['Exposición', 'Encuentros B2B (solo expositores)', 'Foro de Industria y Mercado', 'Stage de Conferencias Técnicas'],
   },
 ];
+const enGratis = Date.now() < etapas.finGratis;
+const diasGratis = Math.max(0, Math.ceil((etapas.finGratis - Date.now()) / 86400000));
 ---
 
 <Layout schemaExtra={[faqSchema]}>
@@ -337,7 +339,7 @@ const hitos = [
     <span class="destello destello--banda destello--b2 destello--tarde" aria-hidden="true"></span>
     <div class="marco banda__contenido" data-escalonar>
       <h2 id="banda-registro-titulo">9 y 10 de junio, Torreón</h2>
-      <p class="entrada">Registro de visitante con pago en línea y QR por correo.</p>
+      <p class="entrada">Regístrese gratis hasta el 31 de diciembre de 2026. Después, el boleto tiene costo.</p>
       <p>
         <a class="boton boton--brillo" href={ruta('registro/')} data-cta="registrarme" data-cta-location="banda">Registrarme<span class="boton__barrido" aria-hidden="true"></span></a>
       </p>
@@ -532,29 +534,53 @@ const hitos = [
         <h2 id="boletos-titulo">Boleto de visitante y registro en tres pasos</h2>
       </div>
       <div class="boletos">
-        <div class="panel chaflan boleto pila-lg">
+        <div class="panel chaflan boleto pila-lg" data-etapas={etapas.finGratis}>
           <h3>Boleto de visitante</h3>
+          <p>El precio va por etapas: si se registra a tiempo, no paga.</p>
+          <ol class="etapas">
+            <li class:list={['etapa', { 'etapa--actual': enGratis }]} data-etapa="gratis">
+              <p class="etapa__cabeza">
+                <span class="etapa__rotulo cifra">{etapas.gratis.rotulo}</span>
+                <span class="etapa__estado" data-etapa-estado>{enGratis ? 'Vigente' : 'Cerrada'}</span>
+              </p>
+              <p class="etapa__precio">{etapas.gratis.precio}</p>
+              <p class="etapa__fechas">{etapas.gratis.fechas}</p>
+              <p class="etapa__cuenta cifra" data-etapa-cuenta hidden={!enGratis}>
+                Quedan <span data-etapa-dias>{diasGratis}</span> días
+              </p>
+            </li>
+            <li class:list={['etapa', { 'etapa--actual': !enGratis }]} data-etapa="costo">
+              <p class="etapa__cabeza">
+                <span class="etapa__rotulo cifra">{etapas.conCosto.rotulo}</span>
+                <span class="etapa__estado" data-etapa-estado>{enGratis ? 'Próxima' : 'Vigente'}</span>
+              </p>
+              <p class="etapa__precio etapa__precio--pendiente"><Pendiente texto="precio" /></p>
+              <p class="etapa__fechas">{etapas.conCosto.fechas}</p>
+            </li>
+          </ol>
           <dl class="boleto__datos">
-            <div><dt class="fuerte">Precio</dt><dd><Pendiente texto="precio del boleto" /></dd></div>
             <div><dt class="fuerte">Incluye</dt><dd><Pendiente texto="qué incluye el boleto" /></dd></div>
-            <div><dt class="fuerte">Registro</dt><dd>Apertura y cierre: <Pendiente texto="fechas" /></dd></div>
+            <div><dt class="fuerte">Cierre del registro</dt><dd><Pendiente texto="fecha" /></dd></div>
           </dl>
           <p>
-            <a class="boton boton--brillo" href={ruta('registro/')} data-cta="ir_registro" data-cta-location="boletos">Ir al registro<span class="boton__barrido" aria-hidden="true"></span></a>
+            <a class="boton boton--brillo" href={ruta('registro/')} data-cta="ir_registro" data-cta-location="boletos"><span data-etapa-cta>{enGratis ? 'Registrarme gratis' : 'Ir al registro'}</span><span class="boton__barrido" aria-hidden="true"></span></a>
           </p>
         </div>
         <ol class="pasos" data-escalonar>
           <li>
             <span class="pasos__numero cifra">1</span>
-            <h3>Elija su boleto y pague</h3>
-            <p>En línea con Mercado Pago: tarjeta de crédito o débito, efectivo en tiendas de conveniencia y otros medios activos.</p>
+            <h3>Regístrese</h3>
+            <p>
+              Hasta el 31 de diciembre de 2026 es gratis. Desde el 1 de enero de 2027 paga en línea con Mercado Pago:
+              tarjeta de crédito o débito, efectivo en tiendas de conveniencia y otros medios activos.
+            </p>
           </li>
           <li>
             <span class="pasos__numero cifra">2</span>
             <h3>Reciba su QR por correo</h3>
             <p>
-              Le llega un QR individual cuando el pago queda aprobado. Si paga en efectivo, recibe las instrucciones; si
-              la ficha vence sin pagarse, el lugar se libera.
+              Le llega un QR individual al registrarse en la etapa gratis, o cuando el pago queda aprobado. Si paga en
+              efectivo, recibe las instrucciones; si la ficha vence sin pagarse, el lugar se libera.
             </p>
           </li>
           <li>
@@ -661,6 +687,29 @@ const hitos = [
 
 <script>
   const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Etapas del boleto: la página se construye una vez; aquí se
+  // corrige en el navegador cuál etapa está vigente y cuántos días quedan.
+  const panelEtapas = document.querySelector<HTMLElement>('[data-etapas]');
+  if (panelEtapas) {
+    const fin = Number(panelEtapas.dataset.etapas);
+    const gratis = Date.now() < fin;
+    const [e1, e2] = Array.from(panelEtapas.querySelectorAll<HTMLElement>('.etapa'));
+    e1?.classList.toggle('etapa--actual', gratis);
+    e2?.classList.toggle('etapa--actual', !gratis);
+    const estado = (el: HTMLElement | undefined, t: string) => {
+      const s = el?.querySelector<HTMLElement>('[data-etapa-estado]');
+      if (s) s.textContent = t;
+    };
+    estado(e1, gratis ? 'Vigente' : 'Cerrada');
+    estado(e2, gratis ? 'Próxima' : 'Vigente');
+    const cuenta = panelEtapas.querySelector<HTMLElement>('[data-etapa-cuenta]');
+    const dias = panelEtapas.querySelector<HTMLElement>('[data-etapa-dias]');
+    if (cuenta) cuenta.hidden = !gratis;
+    if (dias) dias.textContent = String(Math.max(0, Math.ceil((fin - Date.now()) / 86400000)));
+    const cta = panelEtapas.querySelector<HTMLElement>('[data-etapa-cta]');
+    if (cta) cta.textContent = gratis ? 'Registrarme gratis' : 'Ir al registro';
+  }
 
   // ---------- Parallax (v2.2): solo transform, un rAF por cuadro ----------
   // Portada: el video/póster baja a 0.18 de la velocidad del scroll (se ve más
@@ -1795,6 +1844,87 @@ const hitos = [
   .boletos {
     display: grid;
     gap: var(--spacing-2xl);
+  }
+  /* Etapas del boleto: dos tarjetas; la vigente con borde cian y halo. */
+  .etapas {
+    list-style: none;
+    margin-inline: 0;
+    margin-bottom: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--spacing-md);
+  }
+  @media (min-width: 480px) {
+    .etapas {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .etapa {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    padding: 16px;
+    border: 1px solid rgb(169 187 211 / 0.28);
+    border-radius: 3px;
+    background: rgb(0 17 47 / 0.35);
+  }
+  .etapa p {
+    margin: 0;
+  }
+  .etapa--actual {
+    border-color: var(--color-signal-cyan);
+    box-shadow: 0 0 0 1px rgb(1 246 250 / 0.25), 0 0 28px -6px rgb(1 246 250 / 0.45);
+  }
+  .etapa__cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .etapa__rotulo {
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-on-navy-muted);
+  }
+  .etapa__estado {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid rgb(169 187 211 / 0.4);
+    color: var(--color-on-navy-muted);
+  }
+  .etapa--actual .etapa__estado {
+    border-color: var(--color-signal-cyan);
+    color: var(--color-signal-cyan);
+  }
+  .etapa__precio {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-lg);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--color-on-navy);
+  }
+  .etapa--actual .etapa__precio {
+    color: var(--color-signal-cyan);
+  }
+  .etapa__precio--pendiente {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  .etapa__fechas {
+    color: var(--color-on-navy-muted);
+  }
+  .etapa__cuenta {
+    font-weight: 700;
+    color: var(--color-on-navy);
   }
   .boleto__datos {
     margin-bottom: 0;
