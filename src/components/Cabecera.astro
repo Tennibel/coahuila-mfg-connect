@@ -1,9 +1,10 @@
 ---
 /**
- * Cabecera — logo del evento en vector y
- * navegación por anclas, en tipo oración. En la portada es fija y
- * transparente sobre el video; al bajar pasa a marino sólido con un filete de
- * 1 px. En las demás páginas es marina desde el inicio.
+ * Cabecera tech (v2.3, pedido de Cori): barra de estado con fecha, sede,
+ * coordenadas y cuenta regresiva; barra principal de vidrio esmerilado con
+ * enlaces numerados, CTA con brillo, filete degradado con destello y barra de
+ * progreso de lectura. En la portada es fija y transparente sobre el video; al
+ * bajar pasa a vidrio marino. En las demás páginas es marina desde el inicio.
  */
 import settings from '../content/settings';
 import { ruta } from '../lib/rutas';
@@ -23,9 +24,29 @@ const enlaces = [
   { href: ruta('#sede'), texto: 'Sede' },
   { href: ruta('#preguntas'), texto: 'Preguntas' },
 ];
+
+const INICIO = Date.UTC(2027, 5, 9, 6); // 9 de junio de 2027, 00:00 en Torreón
+const diasFaltan = Math.max(0, Math.ceil((INICIO - Date.now()) / 86400000));
+const num = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
 <header class:list={['cabecera', { 'cabecera--portada': sobrePortada }]} data-cabecera>
+  <div class="cabecera__estado">
+    <div class="marco cabecera__estado-fila">
+      <p class="estado__dato">
+        <span class="estado__punto" aria-hidden="true"></span>
+        <span class="cifra">09–10.06.2027</span>
+        <span class="estado__sep" aria-hidden="true">/</span>
+        Centro de Convenciones Torreón
+      </p>
+      <p class="estado__dato estado__dato--coord cifra" aria-hidden="true">25.54° N · 103.45° O</p>
+      <p class="estado__dato" data-cabecera-cuenta data-inicio={INICIO}>
+        <span class="estado__etiqueta">Faltan</span>
+        <span class="cifra estado__dias" data-cabecera-dias>{diasFaltan}</span>
+        <span class="estado__etiqueta">días</span>
+      </p>
+    </div>
+  </div>
   <div class="marco cabecera__fila">
     <a class="cabecera__nombre" href={ruta('')}>
       <img src={ruta('media/logos/coahuila-connect.svg')} alt={settings.negocio.nombre} width="185" height="50" />
@@ -33,9 +54,18 @@ const enlaces = [
 
     <nav class="cabecera__nav" aria-label="Principal">
       <ul>
-        {enlaces.map((e) => <li><a href={e.href}>{e.texto}</a></li>)}
-        <li><a class="cabecera__registro" href={ruta('registro/')}>Registro</a></li>
+        {
+          enlaces.map((e, i) => (
+            <li>
+              <a href={e.href}>
+                <span class="nav__num cifra" aria-hidden="true">{num(i)}</span>
+                {e.texto}
+              </a>
+            </li>
+          ))
+        }
       </ul>
+      <a class="boton boton--brillo cabecera__cta" href={ruta('registro/')} data-cta="registrarme" data-cta-location="cabecera">Registrarme<span class="boton__barrido" aria-hidden="true"></span></a>
     </nav>
 
     <details class="cabecera__menu">
@@ -46,13 +76,51 @@ const enlaces = [
       </summary>
       <nav aria-label="Principal (móvil)">
         <ul>
-          {enlaces.map((e) => <li><a href={e.href}>{e.texto}</a></li>)}
-          <li><a href={ruta('registro/')}>Registro de visitante</a></li>
+          {
+            enlaces.map((e, i) => (
+              <li>
+                <a href={e.href}>
+                  <span class="nav__num cifra" aria-hidden="true">{num(i)}</span>
+                  {e.texto}
+                </a>
+              </li>
+            ))
+          }
+          <li class="menu__cta"><a class="boton boton--brillo" href={ruta('registro/')} data-cta="registrarme" data-cta-location="menu">Registro de visitante<span class="boton__barrido" aria-hidden="true"></span></a></li>
         </ul>
       </nav>
     </details>
   </div>
+  <span class="cabecera__filete" aria-hidden="true"></span>
+  <span class="cabecera__progreso" aria-hidden="true" data-cabecera-progreso></span>
 </header>
+
+<script>
+  // Cuenta regresiva de la barra de estado y barra de progreso de lectura.
+  const cuenta = document.querySelector<HTMLElement>('[data-cabecera-cuenta]');
+  const dias = document.querySelector<HTMLElement>('[data-cabecera-dias]');
+  if (cuenta && dias) {
+    const n = Math.ceil((Number(cuenta.dataset.inicio) - Date.now()) / 86400000);
+    if (n > 0) dias.textContent = String(n);
+    else cuenta.hidden = true;
+  }
+  const barra = document.querySelector<HTMLElement>('[data-cabecera-progreso]');
+  if (barra) {
+    let pendiente = false;
+    const medir = () => {
+      pendiente = false;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      barra.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
+    };
+    window.addEventListener('scroll', () => {
+      if (!pendiente) {
+        pendiente = true;
+        requestAnimationFrame(medir);
+      }
+    }, { passive: true });
+    medir();
+  }
+</script>
 
 {
   sobrePortada && (
@@ -76,7 +144,6 @@ const enlaces = [
     position: relative;
     z-index: 40;
     background: var(--color-navy);
-    border-bottom: 1px solid var(--color-navy-panel);
   }
   .cabecera--portada {
     position: fixed;
@@ -92,10 +159,11 @@ const enlaces = [
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: var(--color-navy);
-    border-bottom: 1px solid var(--color-navy-panel);
+    background: rgb(0 17 47 / 0.72);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    backdrop-filter: blur(14px) saturate(150%);
     opacity: 0;
-    transition: opacity 200ms var(--curva);
+    transition: opacity 250ms var(--curva);
   }
   .cabecera--solida::before,
   .cabecera--menu::before {
@@ -106,7 +174,7 @@ const enlaces = [
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-lg);
-    min-height: var(--cabecera);
+    min-height: 72px;
   }
   .cabecera__nombre {
     display: block;
@@ -122,6 +190,118 @@ const enlaces = [
       height: 48px;
     }
   }
+  /* ---------- Barra de estado ---------- */
+  .cabecera__estado {
+    display: none;
+    border-bottom: 1px solid rgb(1 246 250 / 0.12);
+    background: rgb(0 17 47 / 0.55);
+    font-size: 0.8125rem; /* 13 */
+    letter-spacing: 0.04em;
+    color: var(--color-on-navy-muted);
+  }
+  .cabecera__estado-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    min-height: 32px;
+  }
+  .estado__dato {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    white-space: nowrap;
+  }
+  .estado__dato .cifra,
+  .estado__dias {
+    color: var(--color-on-navy);
+    font-variant-numeric: tabular-nums;
+  }
+  .estado__dias {
+    color: var(--color-signal-cyan);
+    font-weight: 700;
+  }
+  .estado__sep {
+    color: rgb(1 246 250 / 0.5);
+  }
+  .estado__punto {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-signal-cyan);
+    box-shadow: 0 0 8px var(--color-signal-cyan);
+  }
+  .estado__dato--coord {
+    color: var(--color-on-navy-muted);
+  }
+  @media (min-width: 768px) {
+    .cabecera__estado {
+      display: block;
+    }
+  }
+  @media (max-width: 1023px) {
+    .estado__dato--coord {
+      display: none;
+    }
+  }
+
+  /* ---------- Filete degradado con destello y progreso ---------- */
+  .cabecera__filete {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    overflow: hidden;
+    background: linear-gradient(90deg, rgb(1 246 250 / 0) 0%, rgb(1 246 250 / 0.55) 30%, rgb(9 92 228 / 0.9) 60%, rgb(1 246 250 / 0) 100%);
+    pointer-events: none;
+  }
+  .cabecera--portada:not(.cabecera--solida):not(.cabecera--menu) .cabecera__filete {
+    opacity: 0.45;
+  }
+  .cabecera__filete::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 18%;
+    background: linear-gradient(90deg, rgb(244 247 251 / 0), rgb(244 247 251 / 0.95), rgb(244 247 251 / 0));
+    transform: translate3d(-100%, 0, 0);
+    opacity: 0;
+  }
+  .cabecera__progreso {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-signal-cyan));
+    box-shadow: 0 0 10px rgb(1 246 250 / 0.6);
+    transform: scaleX(0);
+    transform-origin: left;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .estado__punto {
+      animation: estado-latir 2.4s ease-in-out infinite;
+    }
+    .cabecera__filete::after {
+      opacity: 1;
+      animation: filete-destello 6s var(--curva) infinite;
+    }
+  }
+  @keyframes estado-latir {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.7); }
+  }
+  @keyframes filete-destello {
+    0% { transform: translate3d(-100%, 0, 0); }
+    35%, 100% { transform: translate3d(650%, 0, 0); }
+  }
+
+  /* ---------- Navegación ---------- */
   .cabecera__nav {
     display: none;
   }
@@ -131,9 +311,29 @@ const enlaces = [
   }
   .cabecera__nav ul {
     display: flex;
-    gap: 20px;
+    gap: 18px;
     align-items: center;
   }
+  .nav__num {
+    font-size: 0.6875rem; /* 11 */
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-signal-cyan);
+    opacity: 0.7;
+    margin-right: 6px;
+    font-variant-numeric: tabular-nums;
+    transition: opacity 200ms var(--curva);
+  }
+  .cabecera__nav a:hover .nav__num,
+  .cabecera__nav a:focus-visible .nav__num {
+    opacity: 1;
+  }
+  .cabecera__cta {
+    min-height: 44px;
+    padding: 10px 20px;
+    font-size: var(--text-label-md);
+  }
+
   .cabecera__nav a,
   .cabecera__menu nav a {
     font-size: var(--text-label-md);
@@ -152,10 +352,10 @@ const enlaces = [
     text-decoration-thickness: 2px;
   }
   /* Subrayado animado (v2.2): filete cian que crece de izquierda a derecha. */
-  .cabecera__nav a {
+  .cabecera__nav li a {
     position: relative;
   }
-  .cabecera__nav a::after {
+  .cabecera__nav li a::after {
     content: '';
     position: absolute;
     left: 0;
@@ -167,17 +367,11 @@ const enlaces = [
     transform-origin: left;
     transition: transform 250ms var(--curva);
   }
-  .cabecera__nav a:hover::after,
-  .cabecera__nav a:focus-visible::after {
+  .cabecera__nav li a:hover::after,
+  .cabecera__nav li a:focus-visible::after {
     transform: scaleX(1);
   }
-  .cabecera__nav .cabecera__registro::after {
-    transform: scaleX(1);
-    height: 1px;
-  }
-  .cabecera__nav .cabecera__registro:hover::after {
-    height: 2px;
-  }
+
   .cabecera__menu summary {
     list-style: none;
     display: inline-flex;
@@ -188,6 +382,11 @@ const enlaces = [
     cursor: pointer;
     font-weight: 600;
     font-size: var(--text-label-md);
+    padding: 0 14px;
+    border: 1px solid rgb(1 246 250 / 0.35);
+    border-radius: var(--radius-sm);
+    background: rgb(0 17 47 / 0.45);
+    box-shadow: 0 0 14px -4px rgb(1 246 250 / 0.5);
   }
   .cabecera__menu summary::-webkit-details-marker {
     display: none;
@@ -205,9 +404,22 @@ const enlaces = [
     left: 0;
     right: 0;
     top: 100%;
-    background: var(--color-navy);
-    border-bottom: 1px solid var(--color-navy-panel);
+    background: rgb(0 17 47 / 0.94);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgb(1 246 250 / 0.25);
     padding: var(--spacing-sm) var(--margen) var(--spacing-lg);
+  }
+  .cabecera__menu nav .nav__num {
+    min-width: 2.2em;
+  }
+  .cabecera__menu .menu__cta {
+    border-top: 0;
+    padding-top: var(--spacing-md);
+  }
+  .cabecera__menu .menu__cta a {
+    width: 100%;
+    justify-content: center;
   }
   .cabecera__menu nav li {
     border-top: 1px solid var(--color-navy-panel);
@@ -219,7 +431,9 @@ const enlaces = [
   }
   @media (min-width: 1100px) {
     .cabecera__nav {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 24px;
     }
     .cabecera__menu {
       display: none;

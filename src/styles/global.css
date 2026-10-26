@@ -84,6 +84,12 @@
   --subida: var(--spacing-seam-rise-mobile);
   --cabecera: 72px;
 }
+/* Cabecera tech (v2.3): barra de estado de 32 px desde 768 px. */
+@media (min-width: 768px) {
+  :root {
+    --cabecera: 105px;
+  }
+}
 @media (min-width: 1024px) {
   :root {
     --seccion: var(--spacing-section);
