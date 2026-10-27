@@ -411,20 +411,6 @@ const cuentaGratis = [
           />
         </div>
       </figure>
-      <ul class="cifras" data-revelar>
-        <li>
-          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> <span data-contar="80">80</span><span class="destello destello--cifra" aria-hidden="true"></span></span>
-          <span class="cifras__etiqueta">empresas proveedoras · meta</span>
-        </li>
-        <li>
-          <span class="cifras__numero cifra"><span class="cifras__prefijo">Más de</span> <span data-contar="60">60</span></span>
-          <span class="cifras__etiqueta">compradores calificados · meta</span>
-        </li>
-        <li>
-          <span class="cifras__numero cifra"><span data-contar="15">15</span><span class="cifras__unidad">min</span></span>
-          <span class="cifras__etiqueta">por cita, en 15 mesas de negocios</span>
-        </li>
-      </ul>
       <div class="cifras-ancha" data-observar>
         <p class="rotulo">Meta</p>
         <p class="cifras__numero cifra"><span data-contar="380">380</span> a <span data-contar="400">400</span><span class="destello destello--cifra destello--tarde" aria-hidden="true"></span></p>
@@ -1843,11 +1829,9 @@ const cuentaGratis = [
     .b2b__foto {
       grid-column: 1 / span 6;
     }
-    .cifras {
-      grid-column: 8 / span 5;
-    }
     .cifras-ancha {
       grid-column: 1 / -1;
+      grid-row: 2;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: end;
       column-gap: var(--spacing-xl);
@@ -1856,7 +1840,9 @@ const cuentaGratis = [
       grid-column: 1 / -1;
     }
     .b2b__panel {
-      grid-column: 1 / span 8;
+      grid-column: 8 / span 5;
+      grid-row: 1;
+      align-self: center;
     }
   }
 
