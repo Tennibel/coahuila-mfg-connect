@@ -10,7 +10,7 @@ function panel_inicio(string $titulo, ?array $usuario = null): void
         . '<meta name="robots" content="noindex,nofollow"><title>' . h($titulo) . ' · Registro Coahuila MFG Connect</title><style>' . PANEL_CSS . '</style></head><body>'
         . '<header class="barra"><div class="marco"><a class="marca" href="/admin/"><img src="/media/logos/coahuila-connect.svg" alt="Coahuila Automotive &amp; Manufacturing Connect" width="178" height="48"><span>Registro</span></a>';
     if ($usuario) {
-        echo '<nav><a href="./">Registros</a><a href="usuarios.php">Usuarios</a>'
+        echo '<nav><a href="./">Registros</a><a href="responsables.php">Responsables</a><a href="usuarios.php">Usuarios</a>'
             . '<form method="post" action="salir.php"><input type="hidden" name="csrf" value="' . h($_SESSION['csrf']) . '"><button>Salir</button></form></nav>';
     }
     echo '</div></header><main class="marco">';
@@ -32,6 +32,11 @@ const PANEL_CSS = <<<'CSS'
 .marca span{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cian);border-left:1px solid #2a4a7d;padding-left:14px}
 .barra .marco{min-height:72px}
 .estado{font-size:.85rem;color:var(--gris);margin:0 0 8px}.estado b{color:var(--texto)}
+.subtitulo{font-size:1rem;margin:0 0 8px;color:var(--gris);text-transform:uppercase;letter-spacing:.06em}
+.cifras--chicas li{min-width:0;padding:0}.cifras--chicas a{display:block;padding:10px 14px;color:inherit;text-decoration:none}.cifras--chicas b{font-size:1.25rem}
+.reasignar select{min-height:34px;padding:4px 8px;font-size:.85rem}
+.acciones{display:flex;gap:8px}.acciones .boton{min-height:34px;padding:0 12px;font-size:.85rem}
+.turno{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:var(--azul);border-radius:999px;padding:2px 8px;margin-left:6px}
 .barra button{background:none;border:1px solid #a9bbd3;color:#f4f7fb;border-radius:4px;padding:6px 12px;cursor:pointer;font:inherit}
 h1{font-size:1.6rem;margin:28px 0 8px}
 .cifras{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0 24px;padding:0;list-style:none}

@@ -32,7 +32,8 @@ if ($origen !== '' && $origen !== $sitio && empty(config()['permitir_origen_loca
 
 $entrada = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($entrada)) $entrada = $_POST;
-$v = fn(string $k): string => trim((string) ($entrada[$k] ?? ''));
+// Sin caracteres de control (saltos de línea incluidos): los datos viajan en asuntos de correo.
+$v = fn(string $k): string => trim((string) preg_replace('/[\x00-\x1F\x7F]+/u', ' ', (string) ($entrada[$k] ?? '')));
 
 // Campo trampa: si un robot lo llena, se responde como si nada.
 if ($v('sitio_web') !== '') responder(200, ['ok' => true, 'folio' => null]);
@@ -90,6 +91,12 @@ try {
     }
     $enviado = enviar_confirmacion($r);
     if ($enviado) $pdo->prepare('UPDATE registros SET correo_enviado = 1 WHERE folio = ?')->execute([$r['folio']]);
+    // Rotación: el registro se asigna al siguiente responsable y se le avisa (con copia a registro@).
+    try {
+        enviar_aviso_responsable($r, asignar_responsable($pdo, $r['folio']));
+    } catch (Throwable $e) {
+        error_log('aviso responsable: ' . $e->getMessage());
+    }
     responder(201, ['ok' => true, 'folio' => $r['folio'], 'qr' => url_qr($r['folio']), 'correo_enviado' => $enviado]);
 } catch (Throwable $e) {
     error_log('registro: ' . $e->getMessage());

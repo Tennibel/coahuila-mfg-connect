@@ -19,6 +19,15 @@ const AREAS = ['Compras', 'Desarrollo de proveedores', 'Ingeniería', 'Manufactu
 const PAISES = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
 // Fin de la etapa gratis: medianoche del 1 de enero de 2027 en Torreón (UTC−6).
 const FIN_GRATIS = '2027-01-01T06:00:00Z';
+// Equipo que atiende los registros, en el orden de la rotación (cliente, 2026-10-27).
+// Solo se cargan la primera vez; después se administran en /admin/responsables.php.
+const RESPONSABLES_INICIALES = [
+    ['Alaide García', 'asispresidencia@anapsa.org'],
+    ['Pamela Chávez', 'info@anapsa.org'],
+    ['Aimee Mauries', 'afiliaciones@anapsa.org'],
+    ['Fernando Díaz', 'fernando.diaz@adndelamanufactura.com'],
+    ['Antonio Zetina', 'antonio.zetina@adndelamanufactura.com'],
+];
 
 function ruta_config(): string
 {
@@ -51,6 +60,7 @@ function bd(): PDO
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
+        actualizar_esquema($pdo);
     }
     return $pdo;
 }
@@ -93,6 +103,84 @@ function crear_tablas(PDO $pdo): void
         ip_hash CHAR(64) NOT NULL,
         creado DATETIME NOT NULL
     )$sufijo");
+}
+
+/**
+ * Cambios a la base después de la instalación. Se aplican solos la primera vez
+ * que corre el código nuevo; la versión queda en la tabla «ajustes».
+ */
+function actualizar_esquema(PDO $pdo): void
+{
+    try {
+        $version = (int) $pdo->query("SELECT valor FROM ajustes WHERE clave = 'esquema'")->fetchColumn();
+    } catch (PDOException $e) {
+        $version = 0;
+    }
+    if ($version >= 2) return;
+
+    $mysql = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql';
+    $id = $mysql ? 'INT UNSIGNED AUTO_INCREMENT PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    $sufijo = $mysql ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci' : '';
+    // v2: responsables con rotación y a quién se asignó cada registro.
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ajustes (clave VARCHAR(40) NOT NULL PRIMARY KEY, valor VARCHAR(255) NOT NULL)$sufijo");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS responsables (
+        id $id,
+        nombre VARCHAR(120) NOT NULL,
+        correo VARCHAR(190) NOT NULL UNIQUE,
+        activo TINYINT NOT NULL DEFAULT 1,
+        creado DATETIME NOT NULL
+    )$sufijo");
+    try {
+        $pdo->exec('ALTER TABLE registros ADD COLUMN responsable_id INT NULL');
+    } catch (PDOException $e) {
+        // ya existía
+    }
+    if ((int) $pdo->query('SELECT COUNT(*) FROM responsables')->fetchColumn() === 0) {
+        $ins = $pdo->prepare('INSERT INTO responsables (nombre, correo, activo, creado) VALUES (?, ?, 1, ?)');
+        foreach (RESPONSABLES_INICIALES as [$nombre, $correo]) $ins->execute([$nombre, $correo, ahora()]);
+    }
+    guardar_ajuste($pdo, 'esquema', '2');
+}
+
+function guardar_ajuste(PDO $pdo, string $clave, string $valor): void
+{
+    $pdo->prepare('DELETE FROM ajustes WHERE clave = ?')->execute([$clave]);
+    $pdo->prepare('INSERT INTO ajustes (clave, valor) VALUES (?, ?)')->execute([$clave, $valor]);
+}
+
+function leer_ajuste(PDO $pdo, string $clave): string
+{
+    $q = $pdo->prepare('SELECT valor FROM ajustes WHERE clave = ?');
+    $q->execute([$clave]);
+    return (string) ($q->fetchColumn() ?: '');
+}
+
+/** Responsables activos en el orden de la rotación. */
+function responsables_activos(PDO $pdo): array
+{
+    return $pdo->query('SELECT * FROM responsables WHERE activo = 1 ORDER BY id')->fetchAll();
+}
+
+/** Quién atenderá el siguiente registro (sin moverle el turno). */
+function siguiente_responsable(PDO $pdo): ?array
+{
+    $activos = responsables_activos($pdo);
+    if (!$activos) return null;
+    $ultimo = (int) leer_ajuste($pdo, 'ultimo_responsable');
+    foreach ($activos as $r) {
+        if ((int) $r['id'] > $ultimo) return $r;
+    }
+    return $activos[0]; // dio la vuelta
+}
+
+/** Asigna el registro al siguiente en turno y avanza la rotación. */
+function asignar_responsable(PDO $pdo, string $folio): ?array
+{
+    $r = siguiente_responsable($pdo);
+    if (!$r) return null;
+    $pdo->prepare('UPDATE registros SET responsable_id = ? WHERE folio = ?')->execute([$r['id'], $folio]);
+    guardar_ajuste($pdo, 'ultimo_responsable', (string) $r['id']);
+    return $r;
 }
 
 function ahora(): string
@@ -186,14 +274,21 @@ function enviar_confirmacion(array $r): bool
         . "Dudas: info@coahuilamfgconnect.com\n$sitio\n";
 
     $html = correo_html($r, $qr, $sitio);
+    return enviar_correo($r['correo'], $asunto, $texto, $html, [], 'info@coahuilamfgconnect.com', 'confirmacion');
+}
 
+/** Envía un correo HTML + texto desde el remitente del registro. */
+function enviar_correo(string $para, string $asunto, string $texto, string $html, array $copia = [], string $responderA = '', string $nombreArchivo = 'correo'): bool
+{
+    $c = config();
+    $de = $c['correo_de'];
+    $nombreDe = $c['correo_nombre'] ?? 'Coahuila MFG Connect';
     $limite = 'b' . bin2hex(random_bytes(8));
-    $cabeceras = [
-        'From: ' . mb_encode_mimeheader($nombreDe, 'UTF-8') . " <$de>",
-        "Reply-To: info@coahuilamfgconnect.com",
-        'MIME-Version: 1.0',
-        "Content-Type: multipart/alternative; boundary=\"$limite\"",
-    ];
+    $cabeceras = ['From: ' . mb_encode_mimeheader($nombreDe, 'UTF-8') . " <$de>"];
+    if ($copia) $cabeceras[] = 'Cc: ' . implode(', ', $copia);
+    if ($responderA) $cabeceras[] = "Reply-To: $responderA";
+    $cabeceras[] = 'MIME-Version: 1.0';
+    $cabeceras[] = "Content-Type: multipart/alternative; boundary=\"$limite\"";
     $cuerpo = "--$limite\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
         . chunk_split(base64_encode($texto))
         . "--$limite\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
@@ -202,11 +297,67 @@ function enviar_confirmacion(array $r): bool
 
     if (!empty($c['correo_simulado'])) {
         // Pruebas en local: el correo se guarda en un archivo en vez de enviarse.
-        file_put_contents($c['correo_simulado'], "Para: {$r['correo']}\nAsunto: $asunto\n\n$texto\n----\n", FILE_APPEND);
-        file_put_contents($c['correo_simulado'] . '.html', $html);
+        file_put_contents($c['correo_simulado'], "Para: $para\nCopia: " . implode(', ', $copia) . "\nAsunto: $asunto\n\n$texto\n----\n", FILE_APPEND);
+        file_put_contents($c['correo_simulado'] . ".$nombreArchivo.html", $html);
         return true;
     }
-    return mail($r['correo'], mb_encode_mimeheader($asunto, 'UTF-8'), $cuerpo, implode("\r\n", $cabeceras), '-f' . $de);
+    return mail($para, mb_encode_mimeheader($asunto, 'UTF-8'), $cuerpo, implode("\r\n", $cabeceras), '-f' . $de);
+}
+
+/**
+ * Aviso interno de un registro nuevo: va a la persona que lo atiende, con copia
+ * al correo de registro, que concentra todos. Responder al aviso le escribe
+ * directo al visitante.
+ */
+function enviar_aviso_responsable(array $r, ?array $resp): bool
+{
+    $c = config();
+    $concentra = $c['correo_de'];
+    $sitio = rtrim($c['sitio'], '/');
+    $panel = $sitio . '/admin/?q=' . rawurlencode($r['folio']);
+    $quien = $resp ? $resp['nombre'] : 'Sin asignar';
+    $asunto = "Nuevo registro · {$r['nombre']} {$r['apellidos']} · {$r['empresa']} → $quien";
+
+    $datos = [
+        'Folio' => $r['folio'],
+        'Nombre' => $r['nombre'] . ' ' . $r['apellidos'],
+        'Correo' => $r['correo'],
+        'Teléfono' => $r['telefono'],
+        'Empresa' => $r['empresa'],
+        'Cargo' => $r['cargo'],
+        'Tipo de empresa' => $r['tipo_empresa'],
+        'Área' => $r['area'],
+        'País' => $r['pais'],
+    ];
+    $texto = "Nuevo registro de visitante. Lo atiende: $quien\n\n";
+    foreach ($datos as $k => $v) $texto .= "$k: $v\n";
+    $texto .= "\nVer en el panel: $panel\nResponder a este correo le escribe al visitante.\n";
+
+    $f = 'font-family:Arial,Helvetica,sans-serif';
+    $filas = '';
+    foreach ($datos as $k => $v) {
+        $valor = $k === 'Correo' ? '<a href="mailto:' . h($v) . '" style="color:#095ce4">' . h($v) . '</a>'
+            : ($k === 'Teléfono' ? '<a href="tel:' . h(preg_replace('/[^0-9+]/', '', $v)) . '" style="color:#095ce4">' . h($v) . '</a>' : h($v));
+        $filas .= '<tr><td style="' . $f . ';font-size:12px;color:#4a5b70;padding:8px 12px 8px 0;border-bottom:1px solid #e3e9f1;white-space:nowrap">' . h($k)
+            . '</td><td style="' . $f . ';font-size:15px;color:#0b1b33;padding:8px 0;border-bottom:1px solid #e3e9f1">' . $valor . '</td></tr>';
+    }
+    $html = '<!doctype html><html lang="es-MX"><body style="margin:0;background:#f4f7fb">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">'
+        . '<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;background:#ffffff;border:1px solid #d8e0ea;border-radius:6px">'
+        . '<tr><td style="background:#00112f;padding:18px 24px;border-bottom:2px solid #01f6fa"><img src="' . h($sitio) . '/media/logos/coahuila-connect-correo.png" width="180" alt="Coahuila MFG Connect" style="display:block;border:0;width:180px;height:auto"></td></tr>'
+        . '<tr><td style="padding:24px">'
+        . '<p style="' . $f . ';font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#095ce4;margin:0 0 6px">Nuevo registro de visitante</p>'
+        . '<p style="' . $f . ';font-size:20px;font-weight:bold;color:#0b1b33;margin:0 0 4px">' . h($r['nombre'] . ' ' . $r['apellidos']) . '</p>'
+        . '<p style="' . $f . ';font-size:15px;color:#4a5b70;margin:0 0 18px">' . h($r['empresa']) . ' · ' . h($r['tipo_empresa']) . '</p>'
+        . '<p style="' . $f . ';font-size:15px;background:#eef6ff;border-left:3px solid #095ce4;padding:10px 12px;margin:0 0 18px">Lo atiende: <strong>' . h($quien) . '</strong></p>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' . $filas . '</table>'
+        . '<p style="margin:22px 0 6px"><a href="' . h($panel) . '" style="display:inline-block;background:#095ce4;color:#ffffff;' . $f . ';font-size:15px;font-weight:bold;text-decoration:none;padding:12px 20px;border-radius:4px">Ver en el panel</a></p>'
+        . '<p style="' . $f . ';font-size:13px;color:#4a5b70;margin:12px 0 0">Si responde a este correo, le escribe directamente al visitante.</p>'
+        . '</td></tr></table></td></tr></table></body></html>';
+
+    $para = $resp['correo'] ?? $concentra;
+    $copia = $resp ? [$concentra] : [];
+    return enviar_correo($para, $asunto, $texto, $html, $copia, $r['correo'], 'aviso');
 }
 
 /**
@@ -314,17 +465,34 @@ function cabeceras_seguras(): void
 // ---------- Utilidades del panel ----------
 
 /** WHERE y parámetros para los filtros de la lista y de la descarga. */
+/** Filtros de la lista y la descarga, leídos de la dirección (?q=&tipo=&pais=&atiende=). */
+function filtros_desde_get(): array
+{
+    $atiende = (string) ($_GET['atiende'] ?? '');
+    return [
+        'q' => trim((string) ($_GET['q'] ?? '')),
+        'tipo' => in_array($_GET['tipo'] ?? '', TIPOS_EMPRESA, true) ? $_GET['tipo'] : '',
+        'pais' => in_array($_GET['pais'] ?? '', PAISES, true) ? $_GET['pais'] : '',
+        'atiende' => ($atiende === 'ninguno' || ctype_digit($atiende)) ? $atiende : '',
+    ];
+}
+
+/** Consulta base: cada registro con quien lo atiende. */
+const SQL_REGISTROS = 'SELECT r.*, s.nombre AS atiende, s.correo AS atiende_correo FROM registros r LEFT JOIN responsables s ON s.id = r.responsable_id';
+
 function filtros_sql(array $f): array
 {
     $w = [];
     $p = [];
     if ($f['q'] !== '') {
-        $w[] = '(nombre LIKE ? OR apellidos LIKE ? OR empresa LIKE ? OR correo LIKE ? OR folio LIKE ?)';
+        $w[] = '(r.nombre LIKE ? OR r.apellidos LIKE ? OR r.empresa LIKE ? OR r.correo LIKE ? OR r.folio LIKE ?)';
         $like = '%' . $f['q'] . '%';
         array_push($p, $like, $like, $like, $like, $like);
     }
-    if ($f['tipo'] !== '') { $w[] = 'tipo_empresa = ?'; $p[] = $f['tipo']; }
-    if ($f['pais'] !== '') { $w[] = 'pais = ?'; $p[] = $f['pais']; }
+    if ($f['tipo'] !== '') { $w[] = 'r.tipo_empresa = ?'; $p[] = $f['tipo']; }
+    if ($f['pais'] !== '') { $w[] = 'r.pais = ?'; $p[] = $f['pais']; }
+    if (($f['atiende'] ?? '') === 'ninguno') $w[] = 'r.responsable_id IS NULL';
+    elseif (($f['atiende'] ?? '') !== '') { $w[] = 'r.responsable_id = ?'; $p[] = (int) $f['atiende']; }
     return [$w ? 'WHERE ' . implode(' AND ', $w) : '', $p];
 }
 
