@@ -4,7 +4,7 @@
 # GitHub Pages sigue publicándose aparte desde main.
 set -e
 cd "$(dirname "$0")/.."
-SITE_URL=https://coahuilamfgconnect.com BASE_PATH=/ PUBLIC_REGISTRO_API=/api/registro.php \
+SITE_URL=https://coahuilamfgconnect.com BASE_PATH=/ PUBLIC_REGISTRO_API=/api/registro.php PUBLIC_GA_ID=G-SX7H6133Q4 \
   npx astro build --outDir dist-dominio
 
 # Registro (PHP + MySQL): API, QR, panel /admin/ e instalador.

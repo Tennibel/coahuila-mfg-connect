@@ -50,7 +50,7 @@ const theme: ThemeConfig = {
     responsable: '', // pendiente: razón social del responsable (¿ANAPSA?)
     domicilio: '', // pendiente: domicilio del responsable
     correoPrivacidad: settings.contacto.email,
-    actualizado: '2026-10-21',
+    actualizado: '2026-10-27',
   },
   consentimiento: 'opt-in',
   whatsapp: { cta: 'Pregunte por WhatsApp' },

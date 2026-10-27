@@ -6,7 +6,8 @@
  * - Fuentes autoalojadas (Fontsource) con las dos variantes latinas precargadas.
  * - Favicons generados en el build desde public/favicon.svg.
  * - JSON-LD: una sola entidad Event (sin reseñas, sin precio hasta tenerlo).
- * - Analítica: no hay GA4 todavía; cuando exista, el consentimiento va antes.
+ * - Analítica: Google Analytics 4 solo en el build del dominio (PUBLIC_GA_ID),
+ *   para que la vista previa de GitHub Pages no cuente visitas.
  */
 import '../styles/global.css';
 import theme from '../theme.config';
@@ -66,12 +67,23 @@ const evento = {
 };
 const esInicio = Astro.url.pathname === ruta('');
 const esquemas = [...(esInicio ? [evento] : []), ...schemaExtra];
+const gaId = import.meta.env.PUBLIC_GA_ID;
 ---
 
 <!doctype html>
 <html lang="es-MX">
   <head>
     <meta charset="UTF-8" />
+    {gaId && (
+      <>
+        <!-- Google tag (gtag.js) -->
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script
+          is:inline
+          set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config',${JSON.stringify(gaId)});`}
+        />
+      </>
+    )}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
