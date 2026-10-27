@@ -2,7 +2,7 @@
 /**
  * Aviso de privacidad integral (LFPDPPP). Borrador para que el cliente lo
  * valide; no es asesoría jurídica. Describe el registro tal como funcionará
- * con cobro (Mercado Pago, QR, hoja de registro) y aclara que hoy la página
+ * (QR por correo, base de datos en el hosting) y aclara que en la vista previa la página
  * de registro es una vista previa que no guarda datos.
  */
 import PaginaTexto from '../components/PaginaTexto.astro';
@@ -43,17 +43,13 @@ const pend = (s: string) => s.startsWith('[pendiente:');
   <ul>
     {datosFormulario.map((d) => <li>{d}</li>)}
   </ul>
-  <p>
-    El pago lo procesa Mercado Pago. Los datos de su tarjeta o de su pago los recibe Mercado Pago directamente; nosotros
-    solo recibimos el estado del pago y su folio. No solicitamos datos personales sensibles.
-  </p>
+  <p>No solicitamos datos personales sensibles.</p>
   <p>Si nos escribe por correo, tratamos los datos que usted comparta en esa conversación.</p>
 
   <h2>Para qué usamos sus datos</h2>
   <p>Finalidades necesarias:</p>
   <ul>
-    <li>Registrarle como visitante, confirmar su pago y enviarle por correo su QR de acceso.</li>
-    <li>Si paga en efectivo, enviarle las instrucciones de pago y liberar el lugar si la ficha vence.</li>
+    <li>Registrarle como visitante y enviarle por correo su QR de acceso.</li>
     <li>Controlar el acceso al evento el 9 y 10 de junio de 2027.</li>
     <li>Atender sus dudas, cambios o aclaraciones sobre su registro.</li>
   </ul>
@@ -74,7 +70,6 @@ const pend = (s: string) => s.startsWith('[pendiente:');
     de la Manufactura) y los proveedores que nos ayudan a operar el registro, que tratan los datos por nuestra cuenta:
   </p>
   <ul>
-    <li>Mercado Pago, que procesa el pago.</li>
     <li>El servicio de correo con el que le enviamos su QR.</li>
     <li>El proveedor de alojamiento del sitio, en cuyo servidor se guarda la base de datos del registro.</li>
   </ul>

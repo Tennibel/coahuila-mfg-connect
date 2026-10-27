@@ -42,5 +42,4 @@ export const datosFormulario = [
   'empresa, cargo y tipo de empresa',
   'área en la que trabaja',
   'país',
-  'forma de pago elegida',
 ];

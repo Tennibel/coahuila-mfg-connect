@@ -39,12 +39,12 @@ export const preguntas: Pregunta[] = [
   {
     pregunta: '¿Cómo pago mi boleto?',
     respuesta:
-      'Hasta el 31 de diciembre de 2026 no hay nada que pagar. Desde el 1 de enero de 2027, en línea con Mercado Pago, con los medios activos en la cuenta del evento: tarjeta de crédito o débito, efectivo en tiendas de conveniencia, entre otros.',
+      'Hasta el 31 de diciembre de 2026 no hay nada que pagar. Desde el 1 de enero de 2027 el boleto tendrá costo; daremos a conocer la forma de pago en este sitio.',
   },
   {
     pregunta: '¿Cuándo recibo mi QR de acceso?',
     respuesta:
-      'Le llega por correo, uno por persona: al registrarse, si es en la etapa gratis, o cuando el pago queda aprobado. Si paga en efectivo, recibe por correo las instrucciones de pago; si la ficha vence sin pagarse, el lugar se libera.',
+      'Le llega por correo en cuanto se registra, uno por persona. También lo ve en pantalla al terminar su registro.',
   },
   {
     pregunta: '¿El boleto de visitante incluye citas B2B?',
