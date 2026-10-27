@@ -1,0 +1,6 @@
+{
+  "name": "coahuila/registro",
+  "description": "Registro de visitantes de Coahuila MFG Connect",
+  "require": { "php": ">=8.0", "chillerlan/php-qrcode": "^5.0" },
+  "config": { "platform": { "php": "8.0.30" }, "optimize-autoloader": true }
+}

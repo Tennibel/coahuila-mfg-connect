@@ -4,7 +4,19 @@
 # GitHub Pages sigue publicándose aparte desde main.
 set -e
 cd "$(dirname "$0")/.."
-SITE_URL=https://coahuilamfgconnect.com BASE_PATH=/ npx astro build --outDir dist-dominio
+SITE_URL=https://coahuilamfgconnect.com BASE_PATH=/ PUBLIC_REGISTRO_API=/api/registro.php \
+  npx astro build --outDir dist-dominio
+
+# Registro (PHP + MySQL): API, QR, panel /admin/ e instalador.
+rsync -a --exclude composer.json --exclude composer.lock --exclude 'instalar-token.php' servidor/ dist-dominio/
+
+# Clave de instalación de un solo uso: solo con «--instalar». Se muestra aquí y
+# en el servidor solo queda su huella; instalar.php la borra al terminar.
+if [[ "$1" == "--instalar" ]]; then
+  TOKEN=$(openssl rand -hex 6)
+  print -r -- "<?php return '$(print -rn -- $TOKEN | shasum -a 256 | cut -d' ' -f1)';" > dist-dominio/_registro/instalar-token.php
+  echo "Clave de instalación (úsala en https://coahuilamfgconnect.com/instalar.php): $TOKEN"
+fi
 cat > dist-dominio/.htaccess <<'HT'
 # HTTPS y dominio sin www
 RewriteEngine On

@@ -25,8 +25,9 @@ const pend = (s: string) => s.startsWith('[pendiente:');
   claro
 >
   <p class="entrada">
-    Este sitio está en vista previa: el formulario de registro todavía no envía, no cobra y no guarda ningún dato.
-    Este aviso describe cómo se tratarán los datos cuando el registro esté activo.
+    {import.meta.env.PUBLIC_REGISTRO_API
+      ? 'Este aviso describe cómo tratamos los datos de quienes se registran como visitantes en este sitio.'
+      : 'Este sitio está en vista previa: el formulario de registro todavía no envía, no cobra y no guarda ningún dato. Este aviso describe cómo se tratarán los datos cuando el registro esté activo.'}
   </p>
 
   <h2>Quién es responsable de sus datos</h2>
@@ -75,8 +76,7 @@ const pend = (s: string) => s.startsWith('[pendiente:');
   <ul>
     <li>Mercado Pago, que procesa el pago.</li>
     <li>El servicio de correo con el que le enviamos su QR.</li>
-    <li>Google, donde se lleva la hoja de registro de asistentes.</li>
-    <li>El proveedor de alojamiento del sitio.</li>
+    <li>El proveedor de alojamiento del sitio, en cuyo servidor se guarda la base de datos del registro.</li>
   </ul>
 
   <h2>Sus derechos ARCO</h2>

@@ -1,8 +1,11 @@
 ---
 /**
- * /registro — formulario de visitante en VISTA PREVIA.
+ * /registro — formulario de visitante.
  *
- * Vive en GitHub Pages: no cobra, no guarda y no envía nada. Lo dice arriba y
+ * Dos modos según PUBLIC_REGISTRO_API (lo define scripts/build-dominio.sh):
+ * - Con API (coahuilamfgconnect.com): guarda el registro en la base de datos
+ *   del hosting (servidor/api/registro.php) y muestra el folio y el QR.
+ * - Sin API (GitHub Pages): VISTA PREVIA que no cobra, no guarda y no envía nada. Lo dice arriba y
  * junto al botón. Al «enviar» valida en el navegador y muestra lo que pasaría
  * con el registro activo (Mercado Pago → QR por correo → acceso) y un QR de
  * MUESTRA que no se puede escanear. Nunca dice «ya está registrado».
@@ -23,13 +26,17 @@ const paises = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
 // Tipo de empresa (Cori, 2026-10-26).
 const tipos = ['Empresa compradora', 'Empresa proveedora', 'Empresa de servicios', 'Empresa patrocinadora'];
 const enGratis = Date.now() < etapas.finGratis;
+const api = import.meta.env.PUBLIC_REGISTRO_API ?? '';
+const real = Boolean(api);
 
 ---
 
 <Layout
-  title="Registro de visitante (vista previa) · Coahuila MFG Connect"
-  description="Vista previa del registro de visitante de Coahuila Automotive & Manufacturing Connect. Todavía no cobra ni guarda datos."
-  noindex
+  title={real ? 'Registro de visitante · Coahuila MFG Connect 2027' : 'Registro de visitante (vista previa) · Coahuila MFG Connect'}
+  description={real
+    ? 'Regístrese gratis como visitante a Coahuila Automotive & Manufacturing Connect: 9 y 10 de junio de 2027, Expo Center Laguna, Torreón. Reciba su QR por correo.'
+    : 'Vista previa del registro de visitante de Coahuila Automotive & Manufacturing Connect. Todavía no cobra ni guarda datos.'}
+  noindex={!real}
 >
   <!-- Cabecera marina corta: h1 + aviso de vista previa -->
   <div class="registro__cabeza">
@@ -54,10 +61,12 @@ const enGratis = Date.now() < etapas.finGratis;
           9 y 10 de junio de 2027, Expo Center Laguna. Expositores y patrocinadores:
           <a href={ruta('#expositores')}>escríbanos</a>, no se registran aquí.
         </p>
-        <p class="aviso-previa" role="note">
-          <span class="rotulo aviso-previa__rotulo">Vista previa</span>
-          Este formulario todavía no cobra ni guarda datos. Puede llenarlo para ver cómo funcionará; no se enviará nada.
-        </p>
+        {!real && (
+          <p class="aviso-previa" role="note">
+            <span class="rotulo aviso-previa__rotulo">Vista previa</span>
+            Este formulario todavía no cobra ni guarda datos. Puede llenarlo para ver cómo funcionará; no se enviará nada.
+          </p>
+        )}
       </div>
       <div class="col-margen registro__margen nota pila">
         <p>Boleto de visitante: gratis hasta el 31 de diciembre de 2026. Desde el 1 de enero de 2027 tendrá costo.</p>
@@ -71,7 +80,7 @@ const enGratis = Date.now() < etapas.finGratis;
     <div class="marco">
       <div class="reticula">
         <div class="col-contenido">
-          <form id="form-registro" class="form" novalidate aria-describedby="nota-previa">
+          <form id="form-registro" class="form" novalidate aria-describedby="nota-previa" data-api={api}>
             <fieldset>
               <legend class="form__grupo">Sus datos</legend>
               <div class="form__fila">
@@ -90,7 +99,7 @@ const enGratis = Date.now() < etapas.finGratis;
                 <div class="campo">
                   <label for="correo">Correo electrónico</label>
                   <input id="correo" name="correo" type="email" autocomplete="email" inputmode="email" required data-error="Escriba un correo válido, por ejemplo nombre@empresa.com." />
-                  <p class="campo__ayuda">Aquí le llegaría su QR.</p>
+                  <p class="campo__ayuda">{real ? 'Aquí le llegará su QR.' : 'Aquí le llegaría su QR.'}</p>
                   <p class="campo__error" id="correo-error" hidden></p>
                 </div>
                 <div class="campo">
@@ -185,17 +194,37 @@ const enGratis = Date.now() < etapas.finGratis;
             <p class="campo__error" id="acepto-error" hidden></p>
 
             <div class="form__envio">
-              <p class="aviso-corto" id="nota-previa">
-                Vista previa: este formulario todavía no cobra ni guarda datos.
-              </p>
-              <button class="boton" type="submit" disabled data-cta="revisar_registro" data-cta-location="registro">
-                Revisar mi registro
+              {real ? (
+                <p class="nota" id="nota-previa">Al enviar, guardamos su registro y le enviamos su QR por correo.</p>
+              ) : (
+                <p class="aviso-corto" id="nota-previa">
+                  Vista previa: este formulario todavía no cobra ni guarda datos.
+                </p>
+              )}
+              <button class="boton" type="submit" disabled data-cta={real ? 'enviar_registro' : 'revisar_registro'} data-cta-location="registro">
+                {real ? 'Registrarme gratis' : 'Revisar mi registro'}
               </button>
+              <p class="campo__error" id="envio-error" role="alert" hidden></p>
               <noscript>
-                <p class="nota">Para usar la vista previa del formulario, active JavaScript en su navegador.</p>
+                <p class="nota">Para registrarse, active JavaScript en su navegador o escríbanos a info@coahuilamfgconnect.com.</p>
               </noscript>
             </div>
           </form>
+
+          <section id="confirmado" class="resultado confirmado" hidden tabindex="-1" aria-labelledby="confirmado-titulo">
+            <h2 id="confirmado-titulo">Su registro quedó confirmado</h2>
+            <p class="entrada" data-conf="mensaje">
+              Le enviamos su código QR a <span class="fuerte" data-conf="correo"></span>. Si no lo ve en unos minutos, revise
+              la carpeta de correo no deseado.
+            </p>
+            <figure class="muestra confirmado__qr">
+              <img data-conf="qr" alt="" width="240" height="240" />
+              <figcaption>
+                Folio <span class="fuerte cifra" data-conf="folio"></span>
+              </figcaption>
+              <p class="nota">Presente este QR en el acceso del Expo Center Laguna, el 9 o el 10 de junio de 2027. Puede tomarle captura.</p>
+            </figure>
+          </section>
 
           <section id="resultado" class="resultado" hidden tabindex="-1" aria-labelledby="resultado-titulo">
             <h2 id="resultado-titulo">No se envió nada: así seguiría su registro</h2>
@@ -312,11 +341,67 @@ const enGratis = Date.now() < etapas.finGratis;
       if (c.name === 'pago' || c.name === 'tipo') mostrarError(c.name, '', null);
     });
 
+    const api = form.dataset.api ?? '';
+    const confirmado = document.getElementById('confirmado') as HTMLElement | null;
+    const errorEnvio = document.getElementById('envio-error');
+
+    // Registro real: manda los datos a la API del hosting y muestra folio y QR.
+    const enviar = async () => {
+      if (!boton || !confirmado) return;
+      const datos = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+      const cuerpo = { ...datos, acepto: (form.elements.namedItem('acepto') as HTMLInputElement).checked };
+      const textoBoton = boton.textContent;
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+      if (errorEnvio) errorEnvio.hidden = true;
+      try {
+        const r = await fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) {
+          if (j.campos) {
+            let primero: HTMLElement | null = null;
+            for (const [campo, msj] of Object.entries(j.campos as Record<string, string>)) {
+              const control = form.querySelector<HTMLElement>(`#${campo}`) ?? form.querySelector<HTMLElement>(`[name="${campo}"]`);
+              mostrarError(campo, msj, control?.tagName === 'INPUT' && (control as HTMLInputElement).type === 'radio' ? null : control);
+              if (!primero) primero = control;
+            }
+            primero?.focus();
+          }
+          throw new Error(j.error || 'No pudimos guardar su registro. Intente de nuevo en unos minutos.');
+        }
+        const poner = (k: string, t: string) => confirmado.querySelectorAll<HTMLElement>(`[data-conf="${k}"]`).forEach((el) => (el.textContent = t));
+        poner('correo', String(datos.correo ?? ''));
+        poner('folio', j.folio ?? '');
+        const img = confirmado.querySelector<HTMLImageElement>('[data-conf="qr"]');
+        if (img && j.qr) {
+          img.src = j.qr;
+          img.alt = `Código QR de acceso, folio ${j.folio}`;
+        }
+        const titulo = confirmado.querySelector('#confirmado-titulo');
+        if (titulo && j.repetido) titulo.textContent = 'Ya estaba registrado con este correo';
+        form.hidden = true;
+        confirmado.hidden = false;
+        confirmado.focus();
+        window.scrollTo({ top: confirmado.getBoundingClientRect().top + window.scrollY - 120 });
+      } catch (err) {
+        if (errorEnvio) {
+          errorEnvio.textContent = err instanceof Error ? err.message : 'No pudimos guardar su registro.';
+          errorEnvio.hidden = false;
+        }
+        boton.disabled = false;
+        boton.textContent = textoBoton;
+      }
+    };
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const fallo = validar();
       if (fallo) {
         fallo.focus();
+        return;
+      }
+      if (api) {
+        enviar();
         return;
       }
       // Campo trampa lleno: no se muestra nada (un robot no necesita la vista previa).
@@ -499,6 +584,19 @@ const enGratis = Date.now() < etapas.finGratis;
   }
   .campo__error {
     color: var(--color-error);
+  }
+  .confirmado__qr img {
+    display: block;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 12px;
+    background: #fff;
+    border: 1px solid var(--color-outline, #d8e0ea);
+  }
+  .confirmado__qr figcaption {
+    text-align: center;
+    font-size: 1.125rem;
+    letter-spacing: 0.06em;
   }
   .opciones__boleto {
     margin-bottom: var(--spacing-md);

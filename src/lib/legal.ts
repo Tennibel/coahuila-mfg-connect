@@ -39,7 +39,7 @@ export const datosFormulario = [
   'nombre y apellidos',
   'correo electrónico',
   'teléfono',
-  'empresa y cargo',
+  'empresa, cargo y tipo de empresa',
   'área en la que trabaja',
   'país',
   'forma de pago elegida',
