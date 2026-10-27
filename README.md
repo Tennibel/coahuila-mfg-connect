@@ -1,108 +1,141 @@
-# pz-sites-base
+# Coahuila Automotive & Manufacturing Connect · sitio
 
-Base común de las **Plantillas Z**: sitios Astro para clientes locales con contenido
-editable por el cliente (via [Pages CMS](https://pagescms.org)) y blog integrado.
+Sitio del evento del 9 y 10 de junio de 2027 en el Expo Center Laguna, Torreón.
+Lo organizan ANAPSA y ADN de la Manufactura.
 
-Cosechada de los micrositios (`04-micrositios/disenowebcdmx` + `desarrolloweb` + `_template`).
-De aquí nacen las plantillas por vertical: `pz-restaurante`, `pz-hotel`, `pz-doctor`.
+- **Sitio oficial:** https://coahuilamfgconnect.com, con hosting cPanel (LiteSpeed). Aquí el registro es real.
+- **Vista previa:** https://tennibel.github.io/coahuila-mfg-connect/, en GitHub Pages. El registro es solo de muestra y no tiene Analytics.
 
-## La regla de oro
+El historial de decisiones está en `../agente/bitacora.md` y lo que falta del cliente en `../agente/pendientes.md`.
 
-**Todo lo que el cliente puede editar vive en YAML/Markdown** dentro de `src/content/`.
-**Todo lo técnico vive en `theme.config.ts`** (dominio, colores, tracking) y solo lo toca el desarrollador.
+## Cómo está hecho
 
-| Archivo | Quién lo edita | Qué contiene |
+| Parte | Tecnología | Dónde |
 |---|---|---|
-| `src/content/settings.yaml` | Cliente | Nombre, contacto, dirección, horarios, redes |
-| `src/content/site.yaml` | Cliente | Textos de cada sección (hero, nosotros, FAQ, contacto...) |
-| `src/content/blog/*.md` | Cliente | Posts del blog (uno por archivo) |
-| `src/theme.config.ts` | Desarrollador | Dominio, colores, GA4/Pixel, SEO base |
-| `.pages.yml` | Desarrollador | Qué campos ve el cliente en el panel |
+| Páginas | Astro 6 estático + Tailwind 4 | `src/pages/`, `src/layouts/Layout.astro` |
+| Contenido del evento | TypeScript / YAML | `src/content/evento.ts`, `src/content/settings.yaml` |
+| SEO, colores, textos legales | | `src/theme.config.ts` |
+| Registro, QR, correos y panel | PHP 8 + MySQL | `servidor/` |
+| Analítica | Google Analytics 4 (`G-SX7H6133Q4`) | `Layout.astro`, solo en el dominio |
 
-Los YAML se validan con Zod en cada build (`src/content/site.ts` y `settings.ts`):
-si el cliente rompe el formato, el build falla con mensaje claro y **no se publica un sitio roto**.
+## Las dos versiones
 
-## Qué incluye
+| | Vista previa (GitHub Pages) | Dominio |
+|---|---|---|
+| Se genera con | `npm run build`, o sola con cada push a `main` | `scripts/build-dominio.sh` → `dist-dominio/` |
+| Ruta base | `/coahuila-mfg-connect/` | `/` |
+| Formulario de registro | Vista previa: no guarda nada | Real: `PUBLIC_REGISTRO_API=/api/registro.php` |
+| Google Analytics | No | Sí: `PUBLIC_GA_ID` |
+| PHP del registro y `.htaccess` | No | Se copian desde `servidor/` y se generan en el build |
 
-- Landing completa: Hero, Services, WhyUs, Projects, Testimonials, Plans, FAQ, ContactForm
-- Sidebar del blog (categorías reales, horarios y CTA a WhatsApp)
-- **Blog** desde Markdown local: `/blog`, `/blog/[slug]`, RSS (`/rss.xml`), sitemap, Schema.org Article
-- Schema.org LocalBusiness desde settings (el prop `schemaType` del Layout permite Restaurant/Hotel/Physician)
-- Formulario de leads (`/api/lead`): correo (SMTP) + webhook opcional, límite por IP, antispam
-- Tracking: GA4 + Meta Pixel con consentimiento + eventos (cta_click, whatsapp_click, phone_click, generate_lead, scroll_75)
-- Tailwind v4, accent color por sitio inyectado desde `theme.config.ts`
-- **Kit de requisitos obligatorios** (ver abajo)
+**Cada push a `main` publica la vista previa.**
 
-## Kit de requisitos (2026-10-11)
-
-Lo que pide `10-agente-sitios/REQUISITOS.md` y ya viene resuelto en la base:
-
-| Requisito | Dónde |
-|---|---|
-| Aviso legal, aviso de privacidad, aviso de cookies | `src/pages/aviso-*.astro` + `src/lib/legal.ts` (noindex, fuera del sitemap) |
-| Banner de cookies con Aceptar / Rechazar | `src/components/CookieConsent.astro`; solo aparece si hay GA4, Ads o Pixel |
-| Consentimiento antes de la analítica | `Layout.astro` (Consent Mode de Google + `fbq('consent')`) |
-| HTTPS y encabezados de seguridad | `src/middleware.ts` (red de seguridad; lo principal es Force SSL en NPM) |
-| Favicon .ico, apple-touch-icon, manifest, og-image PNG | `src/pages/*.ts` + `src/lib/iconos.ts`, generados desde `public/favicon.svg` y `public/og-image.svg` |
-| Imágenes comprimidas | `scripts/optimizar-imagenes.mjs`, corre en el Dockerfile |
-| Antispam en formularios | campo trampa + tiempo mínimo en `ContactForm.astro` y `api/lead.ts` |
-| Botón de WhatsApp con CTA | `WhatsAppWidget.astro`; texto en `theme.whatsapp.cta` |
-| Foco visible, movimiento reducido, textos que no se cortan | `src/styles/global.css` |
-| Revisión automática | `npm run revisar` (ver abajo) |
-
-**Al crear el sitio de un cliente, llenar en `theme.config.ts`:** `legal.responsable`,
-`legal.domicilio`, `legal.actualizado` (AAAA-MM-DD) y, si aplica, `legal.correoPrivacidad`,
-`whatsapp.cta` y `consentimiento`. Lo que falte sale como «[pendiente: …]» en los avisos y
-`npm run revisar` lo marca como error. Si la vertical cambia los campos del formulario,
-actualizar `datosFormulario` en `src/lib/legal.ts`.
-
-**Fuera del código (manual):** Force SSL + HSTS en el Proxy Host de Nginx Proxy Manager,
-la ficha de Google (la crea o verifica el cliente) y la cuenta de GA4.
-
-### Revisar un sitio
+## Publicar en el dominio
 
 ```bash
-SITE_URL=https://dominio.com npm run build
-node dist/server/entry.mjs                     # en otra terminal
-npm run revisar -- http://localhost:4321       # --sin-externos para no revisar enlaces externos
-npm run revisar -- https://dominio.com --https dominio.com   # ya publicado: también http→https
+./scripts/publicar-dominio.sh
 ```
 
-Revisa páginas obligatorias, 404 real, títulos/descripciones (falta, largo, repetidos), un solo
-h1, alt y dimensiones de imágenes, datos pendientes, JSON-LD, WhatsApp, antispam y enlaces
-rotos. **No** revisa velocidad (PageSpeed), contraste (axe) ni el consentimiento en Chrome real.
+El script genera la versión del dominio y la sube completa por FTPS con `lftp`.
 
-### Trampas que este kit corrige (no repetir)
+- **Servidor:** se conecta a `priva268.spindns.com` y no a `ftp.coahuilamfgconnect.com`, porque el certificado TLS está a nombre del servidor.
+- **Usuario:** `admin@coahuilamfgconnect.com`.
+- **Contraseña:** se lee del Llavero de macOS (servicio `coahuila-ftp`). La primera vez el script la pide y la guarda ahí.
 
-- **`define:vars` encierra el script en una función.** Un `function gtag(){}` declarado ahí
-  no queda en `window`: GA4 recibía las visitas, pero `generate_lead`, `cta_click` y
-  `scroll_75` nunca salían. Ahora se asigna `window.gtag` explícitamente.
-- **Con `<ClientRouter />`, `astro:page-load` también se dispara en la carga inicial.** Llamar
-  además las funciones al cargar el módulo duplicaba los listeners y cada clic contaba doble.
-- **`TRUST_PROXY_HEADERS` no estaba en ningún sitio:** todos los visitantes compartían un solo
-  contador de 5 envíos cada 10 minutos. Ahora se confía en el proxy por defecto.
-- **En Alpine 3.21+ el paquete de fuentes es `font-dejavu`**, no `ttf-dejavu`.
+> ⚠️ **Sube siempre el sitio completo** (`subir-ftp.sh` sin argumentos). Si cambias estilos, Astro genera un CSS con nombre nuevo (`_astro/index.XXXX.css`). Si solo subes `index.html`, el sitio se ve roto (pasó el 27-oct-2026). Después de publicar, revisa que todos los `/_astro/*` y `/media/*` del HTML respondan 200.
+
+`subir-ftp.sh archivo1 archivo2` sube solo esos archivos. Úsalo solo para cambios de PHP o de imágenes que no tocan el HTML ni el CSS.
+
+`.htaccess` lo escribe `build-dominio.sh`. Hace lo siguiente:
+- redirige a HTTPS sin www;
+- sirve la 404 propia y activa `DirectoryIndex index.html index.php`;
+- define la caché: 30 días para medios, CSS y JS, y 5 minutos para el HTML;
+- agrega las cabeceras de seguridad: HSTS, nosniff, X-Frame-Options, Referrer-Policy y Permissions-Policy.
+
+## Registro de visitantes
+
+Así funciona `servidor/`:
+
+1. **Envío del formulario.** `/registro/` manda un `fetch` POST a `api/registro.php`. La API:
+   - valida los campos y quita caracteres de control;
+   - descarta bots con un campo trampa;
+   - revisa que la petición venga del propio sitio;
+   - limita a 8 envíos por hora por IP (guarda la IP como hash).
+2. **Registro nuevo.**
+   - Se guarda en MySQL con un folio.
+   - El visitante recibe un correo de confirmación con el estilo del sitio y su QR.
+   - Se asigna un responsable y se le manda un aviso.
+3. **Correo ya registrado.** Solo se reenvía el QR a ese correo y la respuesta no trae folio ni QR, para que nadie vea el boleto de otra persona.
+4. **QR.** `qr.php` dibuja el PNG solo si la firma es válida.
+   - Contenido: `CMC2027:FOLIO:FIRMA`.
+   - Firma: HMAC-SHA256 con la clave de la configuración (primeros 20 caracteres).
+   - Librería: `chillerlan/php-qrcode` v5, en `_registro/vendor`.
+
+### Configuración e instalación
+
+- **Configuración.** `~/registro-config.php` está fuera de `public_html` y tiene la conexión a la base, la clave de firma y el remitente. No va en el repo.
+- **Base de datos.** MySQL `coahuilamfgconne_registro` en cPanel. Tablas: `registros`, `usuarios`, `intentos`, `ajustes` y `responsables`.
+- **Cambios de tablas.** `actualizar_esquema()` las actualiza sola al conectarse; la versión del esquema se guarda en `ajustes`.
+- **Instalar desde cero** (ya hecho; solo sirve en un hosting nuevo):
+  1. Corre `./scripts/build-dominio.sh --instalar`. Muestra una clave de un solo uso.
+  2. Sube el sitio.
+  3. Abre `/instalar.php` y captura la base de datos y el primer usuario del panel.
+  4. El instalador borra su clave al terminar.
+- **Carpeta privada.** `_registro/` tiene un `.htaccess` que niega el acceso desde la web.
+
+### Panel `/admin/`
+
+- **Registros:**
+  - lista, filtros y contadores por tipo de empresa y por responsable;
+  - columna «Lo atiende» para reasignar el registro, que avisa a la persona nueva;
+  - botón **Descargar Excel**: un CSV UTF-8 con BOM que incluye a quién se asignó cada registro.
+- **Responsables:** reparto por turnos.
+  - Cada registro nuevo va al siguiente responsable activo, en orden de alta, y al final vuelve a empezar. El turno se guarda en `ajustes.ultimo_responsable`.
+  - Se puede pausar, activar, quitar o agregar responsables. Si quitas a uno, sus registros quedan sin asignar.
+  - El aviso llega al responsable con copia a `registro@coahuilamfgconnect.com`. Al contestarlo, la respuesta va al visitante.
+  - Los cinco iniciales están en `RESPONSABLES_INICIALES`, en `_registro/lib.php`.
+- **Usuarios:** altas y bajas de quienes entran al panel.
+- **Sesión:**
+  - cookie segura;
+  - protección CSRF en los formularios;
+  - vence tras 8 horas sin uso.
+
+### Correo
+
+- **Envío.** Usa `mail()` de PHP desde `registro@coahuilamfgconnect.com`.
+- **DNS.** Ya están publicados:
+  - SPF: `+a +mx +ip4 +include:relay.mailchannels.net`;
+  - DKIM: `default._domainkey`;
+  - DMARC: `p=none`.
+- **Error en cPanel.** «Provide at least one "policy" argument» en Email Deliverability es una falla de esa pantalla, no del dominio. No uses «Repair».
+
+### Probar en local
+
+1. Usa PHP con SQLite.
+2. Pon la configuración de prueba en `.pruebas-registro/`, que git ignora.
+3. Apunta a ella con la variable `REGISTRO_CONFIG`.
+
+## Analítica y privacidad
+
+- **Dónde carga.** La etiqueta de Google va al inicio del `<head>`, y solo cuando existe `PUBLIC_GA_ID`, es decir, en el dominio.
+- **`gtag` global.** Se escribe con `set:html` y no con `define:vars`, porque `define:vars` encierra el script en una función y `gtag` no quedaría global.
+- **Aviso de privacidad.** Explica el uso de Analytics y cómo desactivarlo. No hay banner de consentimiento.
+- **Fecha del aviso.** Está en `theme.legal.actualizado`; cámbiala cada vez que se modifique el aviso.
+
+## Fechas a vigilar
+
+- **1 de enero de 2027:** termina la etapa gratis (`etapas.finGratis` en `evento.ts`, `FIN_GRATIS` en `lib.php`).
+  - El contador se apaga solo.
+  - Hay que cambiar el texto de la banda «Gratis hasta el 31 de diciembre».
+  - Hay que rehacer `public/og-portada.jpg`.
 
 ## Desarrollo
 
 ```bash
 npm install
-npm run dev        # http://localhost:4321
-SITE_URL=https://midominio.com npm run build
-node dist/server/entry.mjs   # probar el build (PORT=4321 por default)
+npm run dev                  # http://localhost:4321/coahuila-mfg-connect/
+npm run build && npm run servir
+npm run revisar -- http://localhost:4321/coahuila-mfg-connect/
 ```
 
-## Crear una nueva plantilla vertical
-
-1. Copia esta carpeta (`cp -R pz-sites-base/ pz-vertical/`)
-2. Ajusta `src/content/site.yaml` y `settings.yaml` con contenido demo del vertical
-3. Agrega colecciones propias en `src/content.config.ts` (ej. `menu` en pz-restaurante)
-4. Ajusta `Navbar`/`Footer` (enlaces) y `theme.config.ts` (accent, SEO)
-5. Refleja los campos nuevos en `.pages.yml`
-
-## Deploy
-
-Igual que los micrositios: Docker en el VPS detrás de Nginx Proxy Manager
-(ver `Dockerfile`, `docker-compose.prod.yml`, `deploy.sh`). El plan a futuro:
-GitHub Actions construye la imagen en cada push y un webhook en el VPS la actualiza,
-para que las ediciones del cliente en Pages CMS se publiquen solas (~3 min).
+Los originales de imágenes y videos (Higgsfield, Nano Banana y fotos de banco) están en `../agente/higgsfield/`. Las imágenes generadas con IA llevan `data-ia="higgsfield"` y aparecen en `/creditos`.
