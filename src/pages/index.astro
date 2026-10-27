@@ -651,6 +651,16 @@ const cuentaGratis = [
       </div>
     </div>
     <dl class="aliados">
+      <div class="aliados__gobierno">
+        <dt class="fuerte">Con el respaldo del Gobierno del Estado de Coahuila</dt>
+        <dd>
+          <span class="logos-fila logos-fila--gobierno">
+          <img class="logo-suelto logo-suelto--escudo" src={ruta('media/logos/coahuila-gobierno.png')} alt="Coahuila de Zaragoza, Gobierno del Estado" width="167" height="192" loading="lazy" />
+          <img class="logo-suelto" src={ruta('media/logos/coahuila-pa-delante.png')} alt="Coahuila Pa’ Delante" width="529" height="144" loading="lazy" />
+          <img class="logo-suelto" src={ruta('media/logos/sec-coahuila.png')} alt="SEC, Secretaría de Economía de Coahuila" width="361" height="144" loading="lazy" />
+          </span>
+        </dd>
+      </div>
       <div>
         <dt class="fuerte">Aliados</dt>
         <dd>
@@ -2232,6 +2242,20 @@ const cuentaGratis = [
   .aliados dd {
     margin: 6px 0 0;
   }
+  .logos-fila--gobierno {
+    align-items: center;
+    gap: 16px 28px;
+  }
+  .logo-suelto.logo-suelto--escudo {
+    height: 88px;
+  }
+  .logo-suelto {
+    display: block;
+    height: 64px;
+    width: auto;
+    max-width: 100%;
+    margin-top: 6px;
+  }
   .logo-placa {
     display: inline-block;
     max-width: 100%;
@@ -2255,6 +2279,9 @@ const cuentaGratis = [
     .aliados {
       grid-template-columns: 3fr 1fr;
       column-gap: var(--spacing-gutter);
+    }
+    .aliados__gobierno {
+      grid-column: 1 / -1;
     }
   }
 
