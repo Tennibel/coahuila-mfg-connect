@@ -64,12 +64,13 @@ try {
         responder(429, ['ok' => false, 'error' => 'Demasiados intentos desde esta conexión. Intente más tarde.']);
     }
 
-    // Mismo correo: no se duplica; se reenvía su QR.
+    // Mismo correo: no se duplica; se reenvía su QR SOLO al correo. La respuesta
+    // no lleva folio ni QR: quien escriba un correo ajeno no puede ver el boleto.
     $q = $pdo->prepare('SELECT * FROM registros WHERE correo = ?');
     $q->execute([$correo]);
     if ($previo = $q->fetch()) {
-        $enviado = enviar_confirmacion($previo);
-        responder(200, ['ok' => true, 'repetido' => true, 'folio' => $previo['folio'], 'qr' => url_qr($previo['folio']), 'correo_enviado' => $enviado]);
+        enviar_confirmacion($previo);
+        responder(200, ['ok' => true, 'repetido' => true]);
     }
 
     $r = [

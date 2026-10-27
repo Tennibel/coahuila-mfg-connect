@@ -20,8 +20,8 @@
     "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
     "@fontsource-variable/hubot-sans": "^5.3.0",
     "@tailwindcss/vite": "4.2.2",
-    "astro": "6.1.8",
-    "sharp": "^0.34.5",
+    "astro": "^6.4.8",
+    "sharp": "^0.35.5",
     "tailwindcss": "4.2.2",
     "yaml": "^2.6.0"
   },

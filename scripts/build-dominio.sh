@@ -35,6 +35,9 @@ AddType application/manifest+json .webmanifest
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
   <FilesMatch "\.(avif|webp|png|jpg|svg|woff2|mp4|webm|css|js|ico)$">
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>

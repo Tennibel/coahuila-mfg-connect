@@ -48,7 +48,7 @@ echo '<div class="tabla"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Úl
 foreach ($lista as $u) {
     echo '<tr><td>' . h($u['nombre']) . '</td><td>' . h($u['correo']) . '</td><td>' . ($u['ultimo_acceso'] ? h(fecha_local($u['ultimo_acceso'])) : '—') . '</td><td>';
     if ((int) $u['id'] !== (int) $usuario['id']) {
-        echo '<form method="post" onsubmit="return confirm(\'¿Quitar el acceso a ' . h($u['correo']) . '?\')">' . $csrf
+        echo '<form method="post" class="quitar">' . $csrf
             . '<input type="hidden" name="accion" value="quitar"><input type="hidden" name="id" value="' . (int) $u['id'] . '"><button class="boton boton--sec">Quitar</button></form>';
     }
     echo '</td></tr>';
@@ -58,4 +58,5 @@ echo '<h2>Agregar usuario o cambiar contraseña</h2><form class="filtros" method
     . '<label>Nombre<input name="nombre"></label><label>Correo<input type="email" name="correo" required></label>'
     . '<label>Contraseña (10+ caracteres)<input type="password" name="clave" required minlength="10" autocomplete="new-password"></label>'
     . '<button class="boton" name="accion" value="agregar">Agregar</button><button class="boton boton--sec" name="accion" value="clave">Cambiar contraseña</button></form>';
+echo '<script>document.querySelectorAll("form.quitar").forEach(f=>f.addEventListener("submit",e=>{if(!confirm("¿Quitar el acceso a este usuario?"))e.preventDefault();}));</script>';
 panel_fin();

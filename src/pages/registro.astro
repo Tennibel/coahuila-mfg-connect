@@ -365,7 +365,18 @@ const real = Boolean(api);
           img.alt = `Código QR de acceso, folio ${j.folio}`;
         }
         const titulo = confirmado.querySelector('#confirmado-titulo');
-        if (titulo && j.repetido) titulo.textContent = 'Ya estaba registrado con este correo';
+        const tarjetaQr = confirmado.querySelector<HTMLElement>('.confirmado__qr');
+        if (j.repetido) {
+          // Por seguridad el QR de un registro previo solo se manda al correo.
+          if (titulo) titulo.textContent = 'Este correo ya estaba registrado';
+          confirmado.querySelector('[data-conf="mensaje"]')!.innerHTML = '';
+          confirmado.querySelector('[data-conf="mensaje"]')!.append(
+            'Le reenviamos su código QR a ',
+            Object.assign(document.createElement('span'), { className: 'fuerte', textContent: String(datos.correo ?? '') }),
+            '. Si no lo ve en unos minutos, revise la carpeta de correo no deseado.'
+          );
+          if (tarjetaQr) tarjetaQr.hidden = true;
+        }
         form.hidden = true;
         confirmado.hidden = false;
         confirmado.focus();

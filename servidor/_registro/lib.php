@@ -10,6 +10,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Los errores van al registro del servidor, nunca a la pantalla.
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 const TIPOS_EMPRESA = ['Empresa compradora', 'Empresa proveedora', 'Empresa de servicios', 'Empresa patrocinadora'];
 const AREAS = ['Compras', 'Desarrollo de proveedores', 'Ingeniería', 'Manufactura', 'Operaciones', 'Dirección de planta', 'Otra'];
 const PAISES = ['México', 'Estados Unidos', 'Canadá', 'Otro'];
@@ -271,11 +275,17 @@ function iniciar_sesion(): void
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/admin/',
-        'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'secure' => !in_array($_SERVER['SERVER_NAME'] ?? '', ['127.0.0.1', 'localhost'], true),
         'httponly' => true,
         'samesite' => 'Strict',
     ]);
     session_start();
+    // Sesión del panel: vence tras 8 horas sin uso.
+    if (!empty($_SESSION['usuario']) && time() - ($_SESSION['visto'] ?? 0) > 8 * 3600) {
+        $_SESSION = [];
+        session_regenerate_id(true);
+    }
+    $_SESSION['visto'] = time();
     if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(16));
 }
 
