@@ -22,6 +22,14 @@ fi
 export LFTP_PASSWORD="$CLAVE"
 unset CLAVE
 
+# Sin argumentos sube todo; con rutas (relativas a dist-dominio/) sube solo esas.
+if (( $# )); then
+  ORDEN=""
+  for f in "$@"; do ORDEN+="put -O public_html/$(dirname "$f") dist-dominio/$f; "; done
+else
+  ORDEN="mirror --reverse --verbose --parallel=3 --no-perms --ignore-time dist-dominio/ public_html/;"
+fi
+
 lftp -e "
 set ftp:ssl-force true;
 set ftp:ssl-protect-data true;
@@ -30,7 +38,7 @@ set ftp:passive-mode true;
 set net:max-retries 3;
 set net:timeout 30;
 open --env-password -u '$USUARIO' ftp://$HOST;
-mirror --reverse --verbose --parallel=3 --no-perms dist-dominio/ public_html/;
+$ORDEN
 bye
 "
 echo "Listo. Revisa https://coahuilamfgconnect.com/"

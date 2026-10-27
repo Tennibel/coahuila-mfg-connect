@@ -66,6 +66,10 @@ $filas = $q->fetchAll();
 
 panel_inicio('Registros', $usuario);
 echo '<h1>Registros de visitantes</h1>';
+// Revisión rápida del servidor: el QR necesita GD y el correo, la función mail().
+$gd = function_exists('imagecreatetruecolor');
+$correo = function_exists('mail');
+echo '<p class="estado">Generador de QR: <b>' . ($gd ? 'listo' : 'falta la extensión GD de PHP') . '</b> · Envío de correos: <b>' . ($correo ? 'listo' : 'no disponible') . '</b> · Remitente: <b>' . h(config()['correo_de']) . '</b></p>';
 echo '<ul class="cifras"><li><b>' . $total . '</b>registros en total</li><li><b>' . (int) $hoy->fetchColumn() . '</b>en las últimas 24 h</li>';
 foreach (TIPOS_EMPRESA as $t) echo '<li><b>' . (int) ($porTipo[$t] ?? 0) . '</b>' . h($t) . '</li>';
 echo '</ul>';

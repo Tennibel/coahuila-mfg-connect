@@ -181,19 +181,7 @@ function enviar_confirmacion(array $r): bool
         . "Presente su código QR en el acceso: $qr\n\n"
         . "Dudas: info@coahuilamfgconnect.com\n$sitio\n";
 
-    $html = '<!doctype html><html lang="es-MX"><body style="margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0b1b33">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">'
-        . '<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:6px;overflow:hidden">'
-        . '<tr><td style="background:#00112f;padding:24px 28px;color:#f4f7fb;font-size:20px;font-weight:bold">Coahuila Automotive &amp; Manufacturing Connect</td></tr>'
-        . '<tr><td style="padding:28px">'
-        . '<p style="font-size:16px;margin:0 0 12px">Hola ' . h($r['nombre']) . ':</p>'
-        . '<p style="font-size:16px;line-height:1.5;margin:0 0 20px">Su registro como visitante quedó <strong>confirmado</strong>. Presente este código QR en el acceso.</p>'
-        . '<p style="text-align:center;margin:0 0 8px"><img src="' . h($qr) . '" width="240" height="240" alt="Código QR de acceso, folio ' . h($r['folio']) . '" style="border:1px solid #d8e0ea"></p>'
-        . '<p style="text-align:center;font-size:18px;font-weight:bold;letter-spacing:2px;margin:0 0 24px">' . h($r['folio']) . '</p>'
-        . '<p style="font-size:15px;line-height:1.5;margin:0 0 6px"><strong>Fecha:</strong> 9 y 10 de junio de 2027</p>'
-        . '<p style="font-size:15px;line-height:1.5;margin:0 0 20px"><strong>Lugar:</strong> Expo Center Laguna, Blvd. Independencia y Libramiento Periférico Raúl López Sánchez, C.P. 27018, Torreón, Coahuila</p>'
-        . '<p style="font-size:14px;line-height:1.5;color:#4a5b70;margin:0">Si no ve el código, ábralo aquí: <a href="' . h($qr) . '">' . h($qr) . '</a><br>Dudas: <a href="mailto:info@coahuilamfgconnect.com">info@coahuilamfgconnect.com</a></p>'
-        . '</td></tr></table></td></tr></table></body></html>';
+    $html = correo_html($r, $qr, $sitio);
 
     $limite = 'b' . bin2hex(random_bytes(8));
     $cabeceras = [
@@ -211,9 +199,67 @@ function enviar_confirmacion(array $r): bool
     if (!empty($c['correo_simulado'])) {
         // Pruebas en local: el correo se guarda en un archivo en vez de enviarse.
         file_put_contents($c['correo_simulado'], "Para: {$r['correo']}\nAsunto: $asunto\n\n$texto\n----\n", FILE_APPEND);
+        file_put_contents($c['correo_simulado'] . '.html', $html);
         return true;
     }
     return mail($r['correo'], mb_encode_mimeheader($asunto, 'UTF-8'), $cuerpo, implode("\r\n", $cabeceras), '-f' . $de);
+}
+
+/**
+ * HTML del correo con el estilo del sitio: fondo marino, acentos cian, logo
+ * del evento y el QR en tarjeta blanca. Solo tablas y estilos en línea (lo que
+ * Gmail, Outlook y Apple Mail respetan); el logo va en PNG porque los correos
+ * no muestran SVG.
+ */
+function correo_html(array $r, string $qr, string $sitio): string
+{
+    $logo = $sitio . '/media/logos/coahuila-connect-correo.png';
+    $fuente = "font-family:Arial,Helvetica,sans-serif";
+    $rotulo = "$fuente;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#01f6fa";
+    $dato = "$fuente;font-size:15px;line-height:22px;color:#f4f7fb";
+    $fila = fn(string $etiqueta, string $valor) =>
+        '<tr><td style="padding:14px 0;border-top:1px solid #1d3a6b">'
+        . '<div style="' . $rotulo . '">' . $etiqueta . '</div>'
+        . '<div style="' . $dato . ';padding-top:4px">' . $valor . '</div></td></tr>';
+
+    return '<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        . '<meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"><title>Registro confirmado</title></head>'
+        . '<body style="margin:0;padding:0;background:#00112f">'
+        . '<div style="display:none;max-height:0;overflow:hidden">Su folio es ' . h($r['folio']) . '. Presente su QR en el acceso del Expo Center Laguna.</div>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#00112f"><tr><td align="center" style="padding:28px 12px">'
+        . '<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px">'
+        // Logo y filete cian
+        . '<tr><td align="center" style="padding:8px 0 22px"><a href="' . h($sitio) . '"><img src="' . h($logo) . '" width="280" height="76" alt="Coahuila Automotive &amp; Manufacturing Connect" style="display:block;border:0;width:280px;height:auto"></a></td></tr>'
+        . '<tr><td style="height:2px;line-height:2px;font-size:0;background:#01f6fa">&nbsp;</td></tr>'
+        // Tarjeta principal
+        . '<tr><td style="background:#00286a;padding:32px 28px 8px">'
+        . '<div style="' . $rotulo . '">Registro confirmado</div>'
+        . '<h1 style="' . $fuente . ';font-size:28px;line-height:32px;font-weight:900;color:#f4f7fb;margin:10px 0 14px">Hola, ' . h($r['nombre']) . '. Ya tiene su lugar.</h1>'
+        . '<p style="' . $fuente . ';font-size:16px;line-height:24px;color:#a9bbd3;margin:0 0 24px">Su registro como visitante a <strong style="color:#f4f7fb">Coahuila Automotive &amp; Manufacturing Connect</strong> quedó confirmado. Presente este código QR en el acceso; puede mostrarlo en su celular o impreso.</p>'
+        // QR en tarjeta blanca con borde cian
+        . '<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto 8px"><tr><td align="center" style="background:#ffffff;border:2px solid #01f6fa;border-radius:6px;padding:16px">'
+        . '<img src="' . h($qr) . '" width="220" height="220" alt="Código QR de acceso, folio ' . h($r['folio']) . '" style="display:block;border:0;width:220px;height:220px">'
+        . '</td></tr></table>'
+        . '<p style="' . $fuente . ';text-align:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#a9bbd3;margin:14px 0 2px">Folio</p>'
+        . '<p style="' . $fuente . ';text-align:center;font-size:24px;font-weight:bold;letter-spacing:3px;color:#01f6fa;margin:0 0 26px">' . h($r['folio']) . '</p>'
+        // Datos del evento
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+        . $fila('Fecha', '9 y 10 de junio de 2027')
+        . $fila('Lugar', 'Expo Center Laguna<br><span style="color:#a9bbd3">Blvd. Independencia y Libramiento Periférico Raúl López Sánchez, C.P. 27018, Torreón, Coahuila</span>')
+        . $fila('Registrado', h($r['nombre'] . ' ' . $r['apellidos']) . '<br><span style="color:#a9bbd3">' . h($r['empresa']) . ' · ' . h($r['tipo_empresa']) . '</span>')
+        . '</table>'
+        // Botones
+        . '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 28px"><tr>'
+        . '<td style="background:#095ce4;border-radius:4px;border:1px solid #01f6fa"><a href="' . h($qr) . '" style="display:inline-block;padding:14px 22px;' . $fuente . ';font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none">Ver mi QR</a></td>'
+        . '<td style="width:12px">&nbsp;</td>'
+        . '<td style="border-radius:4px;border:1px solid #a9bbd3"><a href="' . h($sitio) . '" style="display:inline-block;padding:14px 22px;' . $fuente . ';font-size:15px;font-weight:bold;color:#f4f7fb;text-decoration:none">Ver el evento</a></td>'
+        . '</tr></table>'
+        . '</td></tr>'
+        // Pie
+        . '<tr><td style="padding:22px 28px 8px;' . $fuente . ';font-size:13px;line-height:20px;color:#a9bbd3;text-align:center">'
+        . 'Dudas: <a href="mailto:info@coahuilamfgconnect.com" style="color:#01f6fa">info@coahuilamfgconnect.com</a><br>'
+        . 'Recibe este correo porque se registró como visitante en <a href="' . h($sitio) . '" style="color:#01f6fa">coahuilamfgconnect.com</a>.'
+        . '</td></tr></table></td></tr></table></body></html>';
 }
 
 // ---------- Sesión del panel ----------

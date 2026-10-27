@@ -8,7 +8,7 @@ function panel_inicio(string $titulo, ?array $usuario = null): void
     header('Content-Type: text/html; charset=utf-8');
     echo '<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         . '<meta name="robots" content="noindex,nofollow"><title>' . h($titulo) . ' · Registro Coahuila MFG Connect</title><style>' . PANEL_CSS . '</style></head><body>'
-        . '<header class="barra"><div class="marco"><strong>Coahuila MFG Connect · Registro</strong>';
+        . '<header class="barra"><div class="marco"><a class="marca" href="/admin/"><img src="/media/logos/coahuila-connect.svg" alt="Coahuila Automotive &amp; Manufacturing Connect" width="178" height="48"><span>Registro</span></a>';
     if ($usuario) {
         echo '<nav><a href="./">Registros</a><a href="usuarios.php">Usuarios</a>'
             . '<form method="post" action="salir.php"><input type="hidden" name="csrf" value="' . h($_SESSION['csrf']) . '"><button>Salir</button></form></nav>';
@@ -28,6 +28,10 @@ const PANEL_CSS = <<<'CSS'
 .barra{background:var(--marino);color:#f4f7fb;border-bottom:2px solid var(--cian)}
 .barra .marco{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;min-height:60px}
 .barra nav{display:flex;gap:16px;align-items:center}.barra a{color:#f4f7fb}
+.marca{display:flex;align-items:center;gap:14px;text-decoration:none}.marca img{height:44px;width:auto;display:block}
+.marca span{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cian);border-left:1px solid #2a4a7d;padding-left:14px}
+.barra .marco{min-height:72px}
+.estado{font-size:.85rem;color:var(--gris);margin:0 0 8px}.estado b{color:var(--texto)}
 .barra button{background:none;border:1px solid #a9bbd3;color:#f4f7fb;border-radius:4px;padding:6px 12px;cursor:pointer;font:inherit}
 h1{font-size:1.6rem;margin:28px 0 8px}
 .cifras{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0 24px;padding:0;list-style:none}
