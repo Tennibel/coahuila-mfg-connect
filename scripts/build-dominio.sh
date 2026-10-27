@@ -26,7 +26,7 @@ RewriteRule ^ https://coahuilamfgconnect.com%{REQUEST_URI} [L,R=301]
 
 ErrorDocument 404 /404.html
 Options -Indexes
-DirectoryIndex index.html
+DirectoryIndex index.html index.php
 
 AddType video/webm .webm
 AddType image/avif .avif
