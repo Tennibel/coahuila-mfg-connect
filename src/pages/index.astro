@@ -12,7 +12,7 @@ import Seccion from '../components/Seccion.astro';
 import Pendiente from '../components/Pendiente.astro';
 import Icono from '../components/Icono.astro';
 import settings from '../content/settings';
-import { preguntas, etapas } from '../content/evento';
+import { preguntas, etapas, hoteles } from '../content/evento';
 import { ruta } from '../lib/rutas';
 
 import imgHero from '../assets/ia/08-hero-autos.png';
@@ -723,6 +723,42 @@ const cuentaGratis = [
       <div><dt>Ciudad</dt><dd>Torreón, Coahuila, México</dd></div>
       <div><dt>Dirección</dt><dd>{settings.sede.calle}, C.P. {settings.sede.cp}, {settings.sede.ciudad}, {settings.sede.estado}.<br /><a class="enlace-suelto" href={settings.sede.mapsUrl} target="_blank" rel="noopener">Ver en Google Maps</a></dd></div>
     </dl>
+  </Seccion>
+
+  <!-- ================= Hoteles sede ================= -->
+  <Seccion id="hoteles" titulo="Hoteles sede">
+    <p class="hoteles__fechas">{hoteles.fechas}</p>
+    <div class="hoteles" data-escalonar>
+      {
+        hoteles.lista.map((h) => (
+          <article class="hotel">
+            <h3 class="hotel__nombre">{h.nombre}</h3>
+            <p class="hotel__direccion">
+              {h.direccion}
+              <br />
+              <a class="enlace-suelto" href={h.mapsUrl} target="_blank" rel="noopener">Ver en Google Maps</a>
+            </p>
+            <h4 class="hotel__rotulo">Tarifas exclusivas para asistentes y participantes al evento</h4>
+            <dl class="hotel__tarifas">
+              {h.tarifas.map((t) => (
+                <div>
+                  <dt>{t.habitacion}</dt>
+                  <dd>{t.precio}</dd>
+                </div>
+              ))}
+            </dl>
+            <p class="hotel__incluye">{h.incluye}</p>
+          </article>
+        ))
+      }
+    </div>
+    <p class="hoteles__nota">{hoteles.nota}</p>
+    <p class="hoteles__reserva">
+      <strong>Reservaciones:</strong> {hoteles.reservaciones.nombre}, {hoteles.reservaciones.empresa}.
+      Tel. <a class="enlace-suelto" href={`tel:${hoteles.reservaciones.telefonoHref}`}>{hoteles.reservaciones.telefono}</a> ·
+      <a class="enlace-suelto" href={`mailto:${hoteles.reservaciones.correo}`}>{hoteles.reservaciones.correo}</a>.
+      Mencione que asiste a Coahuila Automotive &amp; Manufacturing Connect.
+    </p>
   </Seccion>
 
   <!-- ================= Preguntas ================= -->
@@ -2333,6 +2369,85 @@ const cuentaGratis = [
     }
     .ficha dd {
       margin: 0;
+    }
+  }
+
+  /* ================= Hoteles sede ================= */
+  .hoteles__fechas {
+    margin: 0 0 var(--spacing-lg);
+    color: var(--color-signal-cyan);
+    font-weight: 600;
+  }
+  .hoteles {
+    display: grid;
+    gap: var(--spacing-lg);
+  }
+  .hotel {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid rgb(169 187 211 / 0.28);
+    border-radius: 3px;
+    background: rgb(0 40 106 / 0.25);
+  }
+  .hotel p {
+    margin: 0;
+  }
+  .hotel__nombre {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  .hotel__direccion,
+  .hotel__incluye {
+    color: var(--color-on-navy-muted);
+  }
+  .hotel__rotulo {
+    margin: 8px 0 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-signal-cyan);
+  }
+  .hotel__tarifas {
+    margin: 0;
+    display: grid;
+  }
+  .hotel__tarifas > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 10px;
+    border-top: 1px solid var(--color-navy-panel);
+  }
+  .hotel__tarifas > div:last-child {
+    border-bottom: 1px solid var(--color-navy-panel);
+  }
+  .hotel__tarifas dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .hoteles__nota,
+  .hoteles__reserva {
+    margin: var(--spacing-lg) 0 0;
+    max-width: var(--spacing-measure);
+    color: var(--color-on-navy-muted);
+  }
+  .hoteles__reserva {
+    margin-top: 12px;
+    overflow-wrap: anywhere;
+  }
+  .hoteles__reserva strong {
+    color: var(--color-on-navy);
+  }
+  @media (min-width: 1024px) {
+    .hoteles {
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--spacing-gutter);
     }
   }
 
