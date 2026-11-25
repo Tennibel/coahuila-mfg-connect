@@ -738,15 +738,7 @@ const cuentaGratis = [
               <br />
               <a class="enlace-suelto" href={h.mapsUrl} target="_blank" rel="noopener">Ver en Google Maps</a>
             </p>
-            <h4 class="hotel__rotulo">Tarifas exclusivas para asistentes y participantes al evento</h4>
-            <dl class="hotel__tarifas">
-              {h.tarifas.map((t) => (
-                <div>
-                  <dt>{t.habitacion}</dt>
-                  <dd>{t.precio}</dd>
-                </div>
-              ))}
-            </dl>
+            <p class="hotel__rotulo">Tarifas exclusivas para asistentes y participantes al evento</p>
             <p class="hotel__incluye">{h.incluye}</p>
           </article>
         ))
@@ -2403,33 +2395,13 @@ const cuentaGratis = [
   .hotel__incluye {
     color: var(--color-on-navy-muted);
   }
-  .hotel__rotulo {
-    margin: 8px 0 0;
+  .hotel .hotel__rotulo {
+    margin-top: 4px;
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-signal-cyan);
-  }
-  .hotel__tarifas {
-    margin: 0;
-    display: grid;
-  }
-  .hotel__tarifas > div {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding-block: 10px;
-    border-top: 1px solid var(--color-navy-panel);
-  }
-  .hotel__tarifas > div:last-child {
-    border-bottom: 1px solid var(--color-navy-panel);
-  }
-  .hotel__tarifas dd {
-    margin: 0;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
   }
   .hoteles__nota,
   .hoteles__reserva {

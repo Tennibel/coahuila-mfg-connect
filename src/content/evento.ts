@@ -21,12 +21,12 @@ export const etapas = {
 /**
  * Hoteles sede (Cori, 2026-11-25), de la cotización de MileniuM Grupo Hotelero
  * Mexicano del 18-nov-2026 a Fernando Díaz: bloqueo abierto del 8 al 10 de
- * junio. Precios por habitación y por noche, con impuestos incluidos (16 % de
- * IVA y 3 % estatal sobre hospedaje). Direcciones de las fichas de IHG.
+ * junio. Por indicación de Cori el sitio no muestra los precios, solo que hay
+ * tarifas exclusivas. Direcciones de las fichas de IHG.
  */
 export const hoteles = {
   fechas: 'Del 8 al 10 de junio de 2027',
-  nota: 'Precios por habitación, por noche, en pesos mexicanos, con impuestos incluidos (16 % de IVA y 3 % de impuesto sobre hospedaje). Sujetos a disponibilidad.',
+  nota: 'Tarifas sujetas a disponibilidad. Para conocerlas y reservar, contacte al hotel:',
   reservaciones: {
     empresa: 'MileniuM Grupo Hotelero Mexicano',
     nombre: 'Ana Ramírez',
@@ -40,23 +40,12 @@ export const hoteles = {
       direccion: 'Blvd. Independencia 1133, Col. Granjas San Isidro, C.P. 27000, Torreón, Coahuila',
       mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Holiday+Inn+Express+Torre%C3%B3n+Blvd.+Independencia+1133',
       incluye: 'Incluye Barra de Desayuno Express en cortesía, internet y lavandería de autoservicio.',
-      tarifas: [
-        { habitacion: 'Estándar sencilla o doble', precio: '$2,081.31' },
-        { habitacion: 'Estándar triple', precio: '$2,319.31' },
-        { habitacion: 'Estándar cuádruple', precio: '$2,557.31' },
-      ],
     },
     {
       nombre: 'Crowne Plaza Torreón',
       direccion: 'Blvd. Torreón-Matamoros 4050, Col. Ex Hacienda Antigua Los Ángeles, C.P. 27260, Torreón, Coahuila',
       mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Crowne+Plaza+Torre%C3%B3n+Blvd.+Torre%C3%B3n-Matamoros+4050',
       incluye: 'Plan europeo: sin desayuno.',
-      tarifas: [
-        { habitacion: 'Estándar sencilla', precio: '$2,438.31' },
-        { habitacion: 'Estándar doble', precio: '$2,438.31' },
-        { habitacion: 'Estándar triple', precio: '$2,676.31' },
-        { habitacion: 'Estándar cuádruple', precio: '$2,914.31' },
-      ],
     },
   ],
 };
